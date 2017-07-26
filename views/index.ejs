@@ -1,11 +1,26 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+    <link rel='stylesheet' href='/stylesheets/font-awesome.css' />
+
+    <script src="/javascripts/angular.min.js"></script>
+    <script src="/javascripts/angular-ui-router.min.js"></script>
+    <script src="/javascripts/ng-i18next.min.js"></script>
+    <script src="/javascripts/d3.js"></script>
+    <script src="/javascripts/responsive-chart.js"></script>
+
+    <script src="/app/d3WorkApp-main-module.js"></script>
+    <script src="/app/d3WorkApp-config.js"></script>
+    <script src="/app/d3WorkApp-services.js"></script>
+    <script src="/app/d3WorkApp-chart-list-controller.js"></script>
+    <script src="/app/d3WorkApp-chart-controller.js"></script>
+    <script src="/app/d3WorkApp-chart-component.js"></script>
+    <script src="/app/bootstrap-app.js"></script>
+</head>
+<body>
+<div ui-view class="container"></div>
+</body>
 </html>

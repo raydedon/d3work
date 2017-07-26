@@ -1,8 +1,129 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
-  color: #00B7FF;
+    color: #00B7FF;
+}
+
+svg {
+    display: block;
+    margin: 0 auto;
+}
+
+/*
+.axis--x path {
+    display: none;
+}
+*/
+
+
+.series .data-point {
+    transition: stroke-width 100ms linear;
+    -moz-transition: stroke-width 100ms linear;
+    -webkit-transition: stroke-width 100ms linear;
+    fill-opacity: .5;
+    stroke-opacity: 1;
+}
+
+.series .data-point.hover {
+    stroke-width: 15px;
+    stroke-opacity: .5;
+}
+
+.priority .data-point {
+    transition: stroke-width 100ms linear;
+    -moz-transition: stroke-width 100ms linear;
+    -webkit-transition: stroke-width 100ms linear;
+    fill-opacity: .5;
+    stroke-opacity: 1;
+}
+
+.priority .data-point.hover {
+    stroke-width: 15px;
+    stroke-opacity: .5;
+}
+
+.tooltip.data-points-tooltip {
+    z-index: -1;
+}
+
+.tooltip.data-points-tooltip.in {
+    z-index: 1070;
+    -webkit-box-shadow: 3px 3px 4px 0px rgba(0,0,0,0.51);
+    -moz-box-shadow: 3px 3px 4px 0px rgba(0,0,0,0.51);
+    box-shadow: 3px 3px 4px 0px rgba(0,0,0,0.51);
+    background-color: rgba(255,255,255,1.0);
+    padding: 1px;
+    border: 1px solid rgba(0,0,0,.2);
+    z-index: 10000;
+    font-family: Arial;
+    font-size: 13px;
+    text-align: left;
+    pointer-events: none;
+    user-select: none;
+    transition: opacity 250ms linear;
+    -moz-transition: opacity 250ms linear;
+    -webkit-transition: opacity 250ms linear;
+    transition-delay: 250ms;
+    -moz-transition-delay: 250ms;
+    -webkit-transition-delay: 250ms;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+}
+
+.data-points-tooltip .tooltip-inner {
+    background-color: #ffffff;
+    color: #000000;
+    text-align: left;
+}
+
+.axis.axis--y path.domain {
+    display: none;
+}
+
+.axis.axis--x path.domain {
+    stroke-opacity: 0.2;
+}
+
+.tree-map-container {
+    margin: 0 auto;
+}
+
+#circle {
+    width: 10px;
+    height: 10px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.tick line {
+    stroke-opacity: 0.2;
+    shape-rendering: crispEdges;
+}
+
+.node circle {
+    fill: #999;
+}
+
+.node text {
+    font: 10px sans-serif;
+}
+
+.node--internal circle {
+    fill: #555;
+}
+
+.node--internal text {
+    text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+}
+
+.link {
+    fill: none;
+    stroke: #555;
+    stroke-opacity: 0.4;
+    stroke-width: 1.5px;
 }

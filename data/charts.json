@@ -1,0 +1,28 @@
+[
+    {
+        "name": "Combined Chart",
+        "type": "COMBINED",
+        "imageURL": "/images/combined.png",
+        "description": "It is a mixture of all the chart types. The Series would be repersented in form of Line and Column."
+    }, {
+        "name": "Radial Dendogram",
+        "type": "CLUSTER",
+        "imageURL": "/images/radialcluster.png",
+        "description": "This is a type of Cluster graph. But colloquially it is called a Radial Dendogram."
+    }, {
+        "name": "Line Chart",
+        "type": "LINE",
+        "imageURL": "/images/line.png",
+        "description": "It is line chart. But all the datapoints are not shown in one shot. It adds data points in iteration."
+    }, {
+        "name": "Customize Chart",
+        "type": "CUSTOMIZE",
+        "imageURL": "/images/line.png",
+        "description": "Customize the chart. User would be able to select the subset of data and also change the styling of the chart on the fly."
+    }, {
+        "name": "Hierarchy Chart with Drag & Drop",
+        "type": "HIERARCHY_DRAG_DROP",
+        "imageURL": "/images/line.png",
+        "description": "It is a employee hierarchy chart with drag and drop feature."
+    }
+]
