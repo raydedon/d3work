@@ -127,3 +127,8 @@ svg {
     stroke-opacity: 0.4;
     stroke-width: 1.5px;
 }
+
+a.thumbnail-charts:focus, a.thumbnail-charts:hover {
+    text-decoration: none;
+}
+
