@@ -42,6 +42,17 @@ router.get('/cluster', function(req, res, next) {
     });
 });
 
+router.get('/customize', function(req, res, next) {
+    var file = path.join(__dirname, '../data', 'superstore-sample-data.tsv');
+    fs.readFile(file, 'utf8', function (err, data) {
+        if (err) {
+            console.log('Error: ' + err);
+            return;
+        }
+        res.json(d3.tsvParse(data));
+    });
+});
+
 /*
 router.get('/line', function(req, res, next) {
     var file = path.join(__dirname, '../data', 'flare.csv');

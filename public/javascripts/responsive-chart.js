@@ -100,6 +100,12 @@
             case 'cluster':
                 rc.models.radialDendogramChart(obj);
                 break;
+            case 'line':
+                rc.models.radialDendogramChart(obj);
+                break;
+            case 'customize':
+                rc.models.combinedChart(obj);
+                break;
             default:
                 rc.models.combinedChart(obj);
         }

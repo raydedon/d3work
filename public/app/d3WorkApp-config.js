@@ -9,6 +9,10 @@ angular.module('d3WorkApp')
                 url: '/home',
                 templateUrl: '../html/thumbnail-view.html'
             })
+            .state('customize', {
+                url: '/customize',
+                templateUrl: '../html/customize-chart-landing.html'
+            })
             .state('chart', {
                 url: '/chart/:chartType',
                 templateUrl: '../html/chart.html'

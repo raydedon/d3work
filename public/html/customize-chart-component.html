@@ -1,0 +1,216 @@
+<div class="tooltip data-points-tooltip">
+    <div class="tooltip-inner"></div>
+</div>
+<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 ">
+    <div class="panel panel-primary">
+        <div class="panel-heading" id="panelHeadingSettings">
+            Demo customization capabilities of D3 charts
+        </div>
+        <div class="panel-body">
+            <select class="input-sm pull-right" id="yearSelector">
+            </select>
+            <div id="panelId"></div>
+        </div>
+    </div>
+</div>
+<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 custom-menu">
+    <form>
+        <uib-accordion close-others="true">
+            <div uib-accordion-group class="panel-default" heading="Legend's config">
+                <div class="form-group">
+                    <label for="dataSet">Align</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <select id="legendHorizontalAlign" name="legendHorizontalAlign" class="form-control input-sm" ng-model="$ctrl.settings.legend.align" ng-change="$ctrl.prepareConfigObjAndRedraw();">
+                            <option value="left">Left</option>
+                            <option value="center">Center</option>
+                            <option value="right" selected>Right</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Vertical Align</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <select id="legendVerticalAlign" name="legendVerticalAlign" class="form-control input-sm" ng-model="$ctrl.settings.legend.verticalAlign" ng-change="$ctrl.prepareConfigObjAndRedraw();">
+                            <option value="top" selected>Top</option>
+                            <option value="middle">Middle</option>
+                            <option value="bottom">Bottom</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+<!--
+            <div uib-accordion-group class="panel-default" heading="Chart Options">
+                <div class="form-group">
+                    <label for="dataSet">Stroke Width</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" name="strokeWidth" id="strokeWidth0" value="1" min="1" max="10" value="2"
+                               ng-change="$('#seriesStrokeWidth2').val($('#strokeWidth0').val()); this.prepareConfigObjAndRedraw();" ng-model="$ctrl.strokeWidth">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Tick Width</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" name="tickWidth" id="tickWidth" value="1" min="1" max="10"
+                               onchange="$('#xAxisTickWidth').val($('#tickWidth').val()); $('#yAxisTickWidth').val($('#tickWidth').val()); prepareConfigObjAndRedraw();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Tick Length</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" name="tickLength" id="tickLength" value="6" min="0" max="10"
+                               onchange="$('#xAxisTickLength').val($('#tickLength').val()); $('#yAxisTickLength').val($('#tickLength').val()); prepareConfigObjAndRedraw();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Display Grid Lines</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="checkbox" name="displayGridLines" id="displayGridLines"
+                               onchange="$('#xAxisDisplayGridLines').prop('checked', $('#displayGridLines').prop('checked')); $('#yAxisDisplayGridLines').prop('checked', $('#displayGridLines').prop('checked')); prepareConfigObjAndRedraw();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Display Value on the Column&frasl;Bar</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="checkbox" name="displayValueOnColBar" id="displayValueOnColBar" onchange="prepareConfigObjAndRedraw();">
+                    </div>
+                </div>
+            </div>
+
+            <div uib-accordion-group class="panel-default" heading="Office Supplies config">
+                <div class="form-group">
+                    <label for="dataSet">Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <div id="cp1" class="input-group colorpicker-component">
+                            <input name="seriesColor" id="seriesColor1" class="form-control input-sm">
+                            <span class="input-group-addon"><i></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div uib-accordion-group class="panel-default" heading="Technology config">
+                <div class="form-group">
+                    <label for="dataSet">Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <div id="cp2" class="input-group colorpicker-component">
+                            <input name="seriesColor" id="seriesColor2" class="form-control input-sm">
+                            <span class="input-group-addon"><i></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Stroke width</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" name="seriesStrokeWidth" id="seriesStrokeWidth2" min="1" max="10" value="2" onchange="prepareConfigObjAndRedraw();">
+                    </div>
+                </div>
+            </div>
+
+            <div uib-accordion-group class="panel-default" heading="Furniture config">
+                <div class="form-group">
+                    <label for="dataSet">Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <div id="cp3" class="input-group colorpicker-component">
+                            <input name="seriesColor" id="seriesColor3" class="form-control input-sm">
+                            <span class="input-group-addon"><i></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div uib-accordion-group class="panel-default" heading="X axis config">
+                <div class="form-group">
+                    <label for="dataSet">Tick Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <div id="cpXTC" class="input-group colorpicker-component">
+                            <input name="xAxisTickColor" id="xAxisTickColor" class="form-control input-sm">
+                            <span class="input-group-addon"><i></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Tick Width</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" name="xAxisTickWidth" id="xAxisTickWidth" value="1" min="1" max="10" onchange="prepareConfigObjAndRedraw();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Tick Length</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" name="xAxisTickLength" id="xAxisTickLength" value="6" min="0" max="10" onchange="prepareConfigObjAndRedraw();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Label Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <div id="cpXLC" class="input-group colorpicker-component">
+                            <input name="xAxisLabelColor" id="xAxisLabelColor" class="form-control input-sm">
+                            <span class="input-group-addon"><i></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Label Font Size</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" name="xAxisLabelFontSize" id="xAxisLabelFontSize" value="10" min="1" max="20" onchange="prepareConfigObjAndRedraw();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Display X Axis Grid Lines</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="checkbox" name="xAxisDisplayGridLines" id="xAxisDisplayGridLines" onchange="prepareConfigObjAndRedraw();">
+                    </div>
+                </div>
+            </div>
+
+            <div uib-accordion-group class="panel-default" heading="Y axis config">
+                <div class="form-group">
+                    <label for="dataSet">Tick Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <div id="cpYTC" class="input-group colorpicker-component">
+                            <input name="yAxisTickColor" id="yAxisTickColor" class="form-control input-sm">
+                            <span class="input-group-addon"><i></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Tick Width</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" name="yAxisTickWidth" id="yAxisTickWidth" value="1" min="1" max="10" onchange="prepareConfigObjAndRedraw();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Tick Length</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" name="yAxisTickLength" id="yAxisTickLength" value="6" min="0" max="10" onchange="prepareConfigObjAndRedraw();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Label Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <div id="cpYLC" class="input-group colorpicker-component">
+                            <input name="yAxisLabelColor" id="yAxisLabelColor" class="form-control input-sm">
+                            <span class="input-group-addon"><i></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Label Font Size</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" name="yAxisLabelFontSize" id="yAxisLabelFontSize" value="10" min="1" max="20" onchange="prepareConfigObjAndRedraw();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Display Y Axis Grid Lines</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="checkbox" name="yAxisDisplayGridLines" id="yAxisDisplayGridLines" onchange="prepareConfigObjAndRedraw();">
+                    </div>
+                </div>
+            </div>
+-->
+
+        </uib-accordion>
+    </form>
+</div>
+
