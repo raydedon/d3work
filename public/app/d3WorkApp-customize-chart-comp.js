@@ -4,96 +4,62 @@
 angular.module('d3WorkApp')
     .component('customizeChartComponent', {
         bindings: {
-            chartType: '@',
-            chartData: '<',
-            settings: '<'
+            settingsObj: '<',
+            count: '@',
+            yearArr: '<',
+            year: '<',
+            updateSettingsReloadGraph: '&'
         },
         templateUrl: '../html/customize-chart-component.html',
         controller: ['HttpService', function(HttpService) {
-            this.$onInit = () => {
-                this.settings = {};
-                this.settings.legend = {};
-                this.settings.legend.align = 'right';
-                this.settings.legend.verticalAlign = 'top';
-
-                this.settings.series = [];
-                this.processedDataArray = [];
-            };
-            this.$postLink = () => {
-                if (this.chartType === 'CUSTOMIZE') {
-                    let colors = d3.scaleOrdinal(d3.schemeCategory10).range();
-                    $.each($('input[name="seriesColor"]'), function (index) {
-                        $(this).val(colors[index]);
-                    });
-                    $('#cp1').colorpicker({
-                        color: $('#seriesColor1').val(),
-                        format: "hex"
-                    }).on('changeColor', function () {
-                        this.prepareConfigObjAndRedraw();
-                    });
-                    $('#cp2').colorpicker({
-                        color: $('#seriesColor2').val(),
-                        format: "hex"
-                    }).on('changeColor', function () {
-                        this.prepareConfigObjAndRedraw();
-                    });
-                    $('#cp3').colorpicker({
-                        color: $('#seriesColor3').val(),
-                        format: "hex"
-                    }).on('changeColor', function () {
-                        this.prepareConfigObjAndRedraw();
-                    });
-                    $('#cpXTC').colorpicker({
-                        color: $('#xAxisTickColor').val(),
-                        format: "hex"
-                    }).on('changeColor', function () {
-                        this.prepareConfigObjAndRedraw();
-                    });
-                    $('#cpXLC').colorpicker({
-                        color: $('#xAxisLabelColor').val(),
-                        format: "hex"
-                    }).on('changeColor', function () {
-                        this.prepareConfigObjAndRedraw();
-                    });
-                    $('#cpYTC').colorpicker({
-                        color: $('#yAxisTickColor').val(),
-                        format: "hex"
-                    }).on('changeColor', function () {
-                        this.prepareConfigObjAndRedraw();
-                    });
-                    $('#cpYLC').colorpicker({
-                        color: $('#yAxisLabelColor').val(),
-                        format: "hex"
-                    }).on('changeColor', function () {
-                        this.prepareConfigObjAndRedraw();
-                    });
-                }
-            };
-
-            this.groupNAggregateNSortJSONData = (issuesRawData) => {
-                return d3.nest()
-                    .key(function(d) {
-                        var year = parseInt(d3.timeParse("%d-%m-%Y")(d['Order Date']).getFullYear());
-                        return year;
-                    }).sortKeys(d3.ascending)
-                    .entries(issuesRawData);
-            };
+            this.$onInit = () => {};
+            this.$postLink = () => {};
 
             this.$onChanges = (changes) => {
-                if (changes.chartData && !changes.chartData.isFirstChange()) {
-                    this.processedDataArray = this.groupNAggregateNSortJSONData(this.chartData);
-                    $.each(this.processedDataArray, function (index, value) {
-                        $('#yearSelector').append($('<option/>', {
-                            value: value.key,
-                            text : value.key
-                        }));
-                    });
-                    rc.addGraph({
-                        chartContainerID: 'panelId',
-                        unProcessedDataArray: this.processedDataArray[0].values,
-                        chartType: this.chartType.toLowerCase()
-                    });
+                if (changes.count && !changes.count.isFirstChange()) {
+                    this.settingsObj = angular.copy(this.settingsObj);
+                    rc.addGraph(this.settingsObj);
                 }
+            };
+
+            this.changeSettingsReloadGraph = () => {
+                this.updateSettingsReloadGraph({
+                    $event: {
+                        settingsObj: this.settingsObj
+                    }
+                });
+            };
+
+            this.changeYearReloadGraph = () => {
+                this.updateSettingsReloadGraph({
+                    $event: {
+                        year: this.year
+                    }
+                });
+            };
+            this.toggleGridLines = () => {
+                this.settingsObj.xAxis.displayGridLines = this.settingsObj.displayGridLines;
+                this.settingsObj.yAxis.displayGridLines = this.settingsObj.displayGridLines;
+                this.changeSettingsReloadGraph();
+            };
+
+            this.fiddleTickWidth = () => {
+                this.settingsObj.xAxis.tickWidth = this.settingsObj.tickWidth;
+                this.settingsObj.yAxis.tickWidth = this.settingsObj.tickWidth;
+                this.changeSettingsReloadGraph();
+            };
+
+            this.fiddleStrokeWidth = () => {
+                this.settingsObj.series[0].strokeWidth = this.settingsObj.strokeWidth;
+                this.settingsObj.series[1].strokeWidth = this.settingsObj.strokeWidth;
+                this.settingsObj.series[2].strokeWidth = this.settingsObj.strokeWidth;
+                this.changeSettingsReloadGraph();
+            };
+
+            this.fiddleTickLength = () => {
+                this.settingsObj.xAxis.tickLength = this.settingsObj.tickLength;
+                this.settingsObj.yAxis.tickLength = this.settingsObj.tickLength;
+                this.changeSettingsReloadGraph();
             };
         }]
     });

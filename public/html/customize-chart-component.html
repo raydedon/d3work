@@ -7,7 +7,11 @@
             Demo customization capabilities of D3 charts
         </div>
         <div class="panel-body">
-            <select class="input-sm pull-right" id="yearSelector">
+            <select class="input-sm pull-right"
+                    ng-model="$ctrl.year"
+                    ng-change="$ctrl.changeYearReloadGraph();"
+                    ng-options="option as option for option in $ctrl.yearArr"
+                    ng-init="$ctrl.year=$ctrl.yearArr[0]">
             </select>
             <div id="panelId"></div>
         </div>
@@ -20,59 +24,64 @@
                 <div class="form-group">
                     <label for="dataSet">Align</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <select id="legendHorizontalAlign" name="legendHorizontalAlign" class="form-control input-sm" ng-model="$ctrl.settings.legend.align" ng-change="$ctrl.prepareConfigObjAndRedraw();">
-                            <option value="left">Left</option>
-                            <option value="center">Center</option>
-                            <option value="right" selected>Right</option>
+                        <select class="form-control input-sm"
+                                ng-model="$ctrl.settingsObj.legend.align"
+                                ng-change="$ctrl.changeSettingsReloadGraph();"
+                                ng-options="option as option for option in ['left', 'center', 'right']"
+                                ng-init="$ctrl.settingsObj.legend.align='right'">
                         </select>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Vertical Align</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <select id="legendVerticalAlign" name="legendVerticalAlign" class="form-control input-sm" ng-model="$ctrl.settings.legend.verticalAlign" ng-change="$ctrl.prepareConfigObjAndRedraw();">
-                            <option value="top" selected>Top</option>
-                            <option value="middle">Middle</option>
-                            <option value="bottom">Bottom</option>
+                        <select class="form-control input-sm"
+                                ng-model="$ctrl.settingsObj.legend.verticalAlign"
+                                ng-change="$ctrl.changeSettingsReloadGraph();"
+                                ng-options="option as option for option in ['top', 'middle', 'bottom']"
+                                ng-init="$ctrl.settingsObj.legend.verticalAlign='top'">
                         </select>
                     </div>
                 </div>
             </div>
 
-<!--
             <div uib-accordion-group class="panel-default" heading="Chart Options">
                 <div class="form-group">
                     <label for="dataSet">Stroke Width</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="range" name="strokeWidth" id="strokeWidth0" value="1" min="1" max="10" value="2"
-                               ng-change="$('#seriesStrokeWidth2').val($('#strokeWidth0').val()); this.prepareConfigObjAndRedraw();" ng-model="$ctrl.strokeWidth">
+                        <input type="range" min="1" max="10"
+                               ng-change="$ctrl.fiddleStrokeWidth();"
+                               ng-model="$ctrl.settingsObj.strokeWidth">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Tick Width</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="range" name="tickWidth" id="tickWidth" value="1" min="1" max="10"
-                               onchange="$('#xAxisTickWidth').val($('#tickWidth').val()); $('#yAxisTickWidth').val($('#tickWidth').val()); prepareConfigObjAndRedraw();">
+                        <input type="range" min="1" max="10"
+                               ng-change="$ctrl.fiddleTickWidth();"
+                               ng-model="$ctrl.settingsObj.tickWidth">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Tick Length</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="range" name="tickLength" id="tickLength" value="6" min="0" max="10"
-                               onchange="$('#xAxisTickLength').val($('#tickLength').val()); $('#yAxisTickLength').val($('#tickLength').val()); prepareConfigObjAndRedraw();">
+                        <input type="range" min="0" max="10"
+                               ng-change="$ctrl.fiddleTickLength();"
+                               ng-model="$ctrl.settingsObj.tickLength">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Display Grid Lines</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="checkbox" name="displayGridLines" id="displayGridLines"
-                               onchange="$('#xAxisDisplayGridLines').prop('checked', $('#displayGridLines').prop('checked')); $('#yAxisDisplayGridLines').prop('checked', $('#displayGridLines').prop('checked')); prepareConfigObjAndRedraw();">
+                        <input type="checkbox"
+                               ng-change="$ctrl.toggleGridLines();"
+                               ng-model="$ctrl.settingsObj.displayGridLines">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Display Value on the Column&frasl;Bar</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="checkbox" name="displayValueOnColBar" id="displayValueOnColBar" onchange="prepareConfigObjAndRedraw();">
+                        <input type="checkbox" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.displayValueOnColBar">
                     </div>
                 </div>
             </div>
@@ -81,28 +90,7 @@
                 <div class="form-group">
                     <label for="dataSet">Color</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <div id="cp1" class="input-group colorpicker-component">
-                            <input name="seriesColor" id="seriesColor1" class="form-control input-sm">
-                            <span class="input-group-addon"><i></i></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div uib-accordion-group class="panel-default" heading="Technology config">
-                <div class="form-group">
-                    <label for="dataSet">Color</label>
-                    <div class="form-control" style="border: none; box-shadow: none;">
-                        <div id="cp2" class="input-group colorpicker-component">
-                            <input name="seriesColor" id="seriesColor2" class="form-control input-sm">
-                            <span class="input-group-addon"><i></i></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="dataSet">Stroke width</label>
-                    <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="range" name="seriesStrokeWidth" id="seriesStrokeWidth2" min="1" max="10" value="2" onchange="prepareConfigObjAndRedraw();">
+                            <input ng-model="$ctrl.settingsObj.series[0].color" colorpicker type="text" ng-change="$ctrl.changeSettingsReloadGraph();">
                     </div>
                 </div>
             </div>
@@ -111,10 +99,22 @@
                 <div class="form-group">
                     <label for="dataSet">Color</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <div id="cp3" class="input-group colorpicker-component">
-                            <input name="seriesColor" id="seriesColor3" class="form-control input-sm">
-                            <span class="input-group-addon"><i></i></span>
-                        </div>
+                        <input ng-model="$ctrl.settingsObj.series[1].color" colorpicker type="text"  ng-change="$ctrl.changeSettingsReloadGraph();">
+                    </div>
+                </div>
+            </div>
+
+            <div uib-accordion-group class="panel-default" heading="Technology config">
+                <div class="form-group">
+                    <label for="dataSet">Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input ng-model="$ctrl.settingsObj.series[2].color" colorpicker type="text"  ng-change="$ctrl.changeSettingsReloadGraph();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dataSet">Stroke width</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" min="1" max="10" value="2" ng-model="$ctrl.settingsObj.series[2].strokeWidth" ng-change="$ctrl.changeSettingsReloadGraph();">
                     </div>
                 </div>
             </div>
@@ -123,43 +123,39 @@
                 <div class="form-group">
                     <label for="dataSet">Tick Color</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <div id="cpXTC" class="input-group colorpicker-component">
-                            <input name="xAxisTickColor" id="xAxisTickColor" class="form-control input-sm">
-                            <span class="input-group-addon"><i></i></span>
-                        </div>
+                        <input ng-model="$ctrl.settingsObj.xAxis.tickColor" colorpicker type="text" ng-change="$ctrl.changeSettingsReloadGraph();">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Tick Width</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="range" name="xAxisTickWidth" id="xAxisTickWidth" value="1" min="1" max="10" onchange="prepareConfigObjAndRedraw();">
+                        <input type="range" name="xAxisTickWidth" id="xAxisTickWidth" value="1" min="1" max="10"
+                               ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.xAxis.tickWidth">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Tick Length</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="range" name="xAxisTickLength" id="xAxisTickLength" value="6" min="0" max="10" onchange="prepareConfigObjAndRedraw();">
+                        <input type="range" value="6" min="0" max="10"
+                               ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.xAxis.tickLength">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Label Color</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <div id="cpXLC" class="input-group colorpicker-component">
-                            <input name="xAxisLabelColor" id="xAxisLabelColor" class="form-control input-sm">
-                            <span class="input-group-addon"><i></i></span>
-                        </div>
+                        <input ng-model="$ctrl.settingsObj.xAxis.labelColor" colorpicker type="text" ng-change="$ctrl.changeSettingsReloadGraph();">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Label Font Size</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="range" name="xAxisLabelFontSize" id="xAxisLabelFontSize" value="10" min="1" max="20" onchange="prepareConfigObjAndRedraw();">
+                        <input type="range" value="10" min="1" max="20" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.xAxis.tickLabelFontSize">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Display X Axis Grid Lines</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="checkbox" name="xAxisDisplayGridLines" id="xAxisDisplayGridLines" onchange="prepareConfigObjAndRedraw();">
+                        <input type="checkbox" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.xAxis.displayGridLines">
                     </div>
                 </div>
             </div>
@@ -168,47 +164,40 @@
                 <div class="form-group">
                     <label for="dataSet">Tick Color</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <div id="cpYTC" class="input-group colorpicker-component">
-                            <input name="yAxisTickColor" id="yAxisTickColor" class="form-control input-sm">
-                            <span class="input-group-addon"><i></i></span>
-                        </div>
+                            <input ng-model="$ctrl.settingsObj.yAxis.tickColor" colorpicker type="text"  ng-change="$ctrl.changeSettingsReloadGraph();">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Tick Width</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="range" name="yAxisTickWidth" id="yAxisTickWidth" value="1" min="1" max="10" onchange="prepareConfigObjAndRedraw();">
+                        <input type="range" value="1" min="1" max="10" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.yAxis.tickWidth">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Tick Length</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="range" name="yAxisTickLength" id="yAxisTickLength" value="6" min="0" max="10" onchange="prepareConfigObjAndRedraw();">
+                        <input type="range" value="6" min="0" max="10" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.yAxis.tickLength">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Label Color</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <div id="cpYLC" class="input-group colorpicker-component">
-                            <input name="yAxisLabelColor" id="yAxisLabelColor" class="form-control input-sm">
-                            <span class="input-group-addon"><i></i></span>
-                        </div>
+                            <input class="form-control input-sm" ng-model="$ctrl.settingsObj.yAxis.labelColor" colorpicker type="text"  ng-change="$ctrl.changeSettingsReloadGraph();">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Label Font Size</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="range" name="yAxisLabelFontSize" id="yAxisLabelFontSize" value="10" min="1" max="20" onchange="prepareConfigObjAndRedraw();">
+                        <input type="range" value="10" min="1" max="20" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.yAxis.tickLabelFontSize">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="dataSet">Display Y Axis Grid Lines</label>
                     <div class="form-control" style="border: none; box-shadow: none;">
-                        <input type="checkbox" name="yAxisDisplayGridLines" id="yAxisDisplayGridLines" onchange="prepareConfigObjAndRedraw();">
+                        <input type="checkbox" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.yAxis.displayGridLines">
                     </div>
                 </div>
             </div>
--->
 
         </uib-accordion>
     </form>
