@@ -57,17 +57,15 @@ router.get('/line', function(req, res, next) {
     res.status(200).json({status:"ok"})
 });
 
-/*
-router.get('/line', function(req, res, next) {
-    var file = path.join(__dirname, '../data', 'flare.csv');
+router.get('/hierarchy', function(req, res, next) {
+    var file = path.join(__dirname, '../data', 'salesHeirarchicalData.tsv');
     fs.readFile(file, 'utf8', function (err, data) {
         if (err) {
             console.log('Error: ' + err);
             return;
         }
-        res.json(d3.csvParse(data));
+        res.json(d3.tsvParse(data));
     });
 });
-*/
 
 module.exports = router;

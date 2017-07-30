@@ -106,6 +106,9 @@
             case 'customize':
                 rc.models.combinedChart(obj);
                 break;
+            case 'hierarchy':
+                rc.models.hierarchyChart(obj);
+                break;
             default:
                 rc.models.combinedChart(obj);
         }
@@ -1487,6 +1490,481 @@
         function resizeTheChart() {
             updateDimensions();
             drawCompleteChart(true);
+        }
+    }
+
+    rc.models.hierarchyChart = (obj) => {
+        let breakPoint = 768,
+            chartContainer = rc.utils.getChartContainer(obj),
+            chartContainerInnerWidth, chartPlotAreaInnerWidth, svg, margin, width, height, innerHeight,
+            processedData = [],
+            unProcessedDataArray = obj.unProcessedDataArray,
+            hierarchicalRoot = {},
+            selectedNode = null,
+            draggingNode = null;
+        // panning variables
+        var panSpeed = 200;
+        var panBoundary = 20; // Within 20px from edges will pan when dragging.;
+        d3.select(chartContainer).html('');
+        svg = d3.select(chartContainer).append('svg').call(d3.zoom().scaleExtent([0.1, 3]).on("zoom", zoom));
+        var canvasInnerWrapper = svg.append('g');
+        var treemap = d3.tree();
+        var i = 0;
+        var dragListener = d3.drag()
+            .on("start", dragStarted)
+            .on("drag", dragging)
+            .on("end", dragEnded);
+        processTheRawDataAndDrawGraph();
+
+
+        function processTheRawDataAndDrawGraph() {
+            processedData = groupNAggregateNSortJSONData(unProcessedDataArray);
+            hierarchicalRoot = d3.hierarchy(processedData, function(d) {
+                return d.values;
+            }).sum(function(d) {
+                return d.value;
+            }).sort(function(a, b) {
+                return b.data.key.toLowerCase() < a.data.key.toLowerCase() ? 1 : -1;
+            });
+            updateDimensions();
+            drawCompleteChart(hierarchicalRoot);
+        }
+
+        function dragStarted(d) {
+            if (d == hierarchicalRoot) {
+                return;
+            }
+            booleanDragStarted = true;
+        }
+
+        function dragging(d) {
+            if (d == hierarchicalRoot) {
+                return;
+            }
+            if (booleanDragStarted) {
+                domNode = this;
+                initiateDrag(d, domNode);
+            }
+            d.x0 += d3.event.dy;
+            d.y0 += d3.event.dx;
+            d3.select(this).attr("transform", "translate(" + d.y0 + "," + d.x0 + ")");
+            updateTempConnector();
+        }
+
+        function dragEnded(d) {
+            if (d == hierarchicalRoot) {
+                return;
+            }
+            domNode = this;
+            if (selectedNode) {
+                // now remove the element from the parent, and insert it into the new elements children
+                var index = draggingNode.parent.children.indexOf(draggingNode);
+                if (index > -1) {
+                    draggingNode.parent.children.splice(index, 1);
+                    if (draggingNode.parent.children.length == 0) {
+                        draggingNode.parent.children = null;
+                        delete draggingNode.parent.children;
+                    }
+                }
+                if (typeof selectedNode.children !== 'undefined' || typeof selectedNode._children !== 'undefined') {
+                    if (typeof selectedNode.children !== 'undefined') {
+                        selectedNode.children.push(draggingNode);
+                    } else {
+                        selectedNode._children.push(draggingNode);
+                    }
+                } else {
+                    selectedNode.children = [];
+                    selectedNode.children.push(draggingNode);
+                }
+                // Make sure that the node being added to is expanded so user can see added node is correctly moved
+                expand(selectedNode);
+                endDrag();
+            } else {
+                endDrag();
+            }
+        }
+
+        function endDrag() {
+            d3.selectAll('.ghostCircle').attr('class', 'ghostCircle');
+            d3.select(domNode).attr('class', 'node');
+            // now restore the mouseover event or we won't be able to drag a 2nd time
+            d3.select(domNode).select('.ghostCircle').attr('pointer-events', '');
+            updateTempConnector();
+            if (draggingNode !== null) {
+                if (selectedNode != null) {
+                    prepareData();
+                    selectedNode = null;
+                }
+                drawCompleteChart(hierarchicalRoot);
+                draggingNode = null;
+            }
+        }
+
+        function prepareData() {
+            var tempHierarchyRoot = d3.hierarchy(traverse(hierarchicalRoot), function(d) {
+                return d.values;
+            }).sum(function(d) {
+                return d.value;
+            }).sort(function(a, b) {
+                return b.data.key.toLowerCase() < a.data.key.toLowerCase() ? 1 : -1;
+            });
+            tempHierarchyRoot.x0 = innerHeight / 2;
+            tempHierarchyRoot.y0 = 0;
+            tempHierarchyRoot.children.forEach(collapse);
+            collapseAppropriateNode(hierarchicalRoot, tempHierarchyRoot);
+            hierarchicalRoot = tempHierarchyRoot;
+        }
+
+        function collapseAppropriateNode(originalTree, destinationTree) {
+            if (typeof originalTree.children !== 'undefined' || typeof originalTree._children !== 'undefined') {
+                if (typeof originalTree.children !== 'undefined') {
+                    if (typeof destinationTree.children == 'undefined') {
+                        destinationTree.children = destinationTree._children;
+                        delete destinationTree._children;
+                    }
+                    destinationTree.children.map(function(destTemp) {
+                        collapseAppropriateNode(originalTree.children.filter(function(d) { return d.data.key === destTemp.data.key})[0], destTemp);
+                    });
+                    return;
+                } else {
+                    /*
+                     destinationTree.children = destinationTree._children;
+                     delete destinationTree._children;
+                     return;
+                     */
+                }
+            }
+            return;
+        }
+
+        function traverse(treeSourceRoot) {
+            var obj = {};
+            obj.key = treeSourceRoot.data.key;
+            var children;
+            if (typeof treeSourceRoot.children !== 'undefined' || typeof treeSourceRoot._children !== 'undefined') {
+                if (typeof treeSourceRoot.children !== 'undefined') {
+                    children = treeSourceRoot.children;
+                } else {
+                    children = treeSourceRoot._children;
+                }
+                obj.values = children.map(function(d) {
+                    return traverse(d);
+                });
+                return obj;
+            }
+            obj.value = treeSourceRoot.value;
+            return obj;
+        }
+
+        function initiateDrag(d, domNode) {
+            draggingNode = d;
+            d3.select(domNode).select('.ghostCircle').attr('pointer-events', 'none');
+            d3.selectAll('.ghostCircle').attr('class', 'ghostCircle show');
+            d3.select(domNode).attr('class', 'node activeDrag');
+
+            canvasInnerWrapper.selectAll("g.node").sort(function(a, b) { // select the parent and sort the path's
+                if (a.id != draggingNode.id) return 1; // a is not the hovered element, send "a" to the back
+                else return -1; // a is the hovered element, bring "a" to the front
+            });
+            // if nodes has children, remove the links and nodes
+            if (d.descendants().length > 1) {
+                // remove link paths
+                canvasInnerWrapper.selectAll("path.link")
+                    .data(d.descendants().slice(1), function(d) {
+                        return d.id;
+                    })
+                    .remove();
+                // remove child nodes
+                canvasInnerWrapper.selectAll("g.node")
+                    .data(d.descendants(), function(d) {
+                        return d.id;
+                    }).filter(function(d, i) {
+                    if (d.id == draggingNode.id) {
+                        return false;
+                    }
+                    return true;
+                }).remove();
+            }
+
+            // remove parent link
+            canvasInnerWrapper.selectAll('path.link').filter(function(d, i) {
+                if (d.id == draggingNode.id) {
+                    return true;
+                }
+                return false;
+            }).remove();
+
+            booleanDragStarted = false;
+        }
+
+        function groupNAggregateNSortJSONData(issuesRawData) {
+            var seriesData = d3.nest()
+                .key(function(d) {
+                    return d.Territory;
+                }).sortKeys(d3.ascending)
+                .rollup(function(v) {
+                    return v.length;
+                })
+                .key(function(d) {
+                    return d.State;
+                }).sortKeys(d3.ascending)
+                .key(function(d) {
+                    return d.County;
+                }).sortKeys(d3.ascending)
+                .key(function(d) {
+                    return d.City;
+                }).sortKeys(d3.ascending)
+                .rollup(function(v) {
+                    return d3.sum(v, function(d) { return parseInt(d.Population.replace(/,/g, ""), 10);});
+                })
+                .entries(issuesRawData);
+            return {key: 'Territories', values: seriesData};
+        }
+
+
+        // Define the zoom function for the zoomable tree
+
+        function zoom() {
+            canvasInnerWrapper.attr("transform", d3.event.transform);
+        }
+
+        function drawCompleteChart(source) {
+            var t = d3.transition()
+                .duration(500)
+                .ease(d3.easeLinear);
+            var levelWidth = [1];
+
+            var childCount = function(level, n) {
+
+                if (n.children && n.children.length > 0) {
+                    if (levelWidth.length <= level + 1) levelWidth.push(0);
+
+                    levelWidth[level + 1] += n.children.length;
+                    n.children.forEach(function(d) {
+                        childCount(level + 1, d);
+                    });
+                }
+            };
+            childCount(0, hierarchicalRoot);
+            treemap.size([d3.max(levelWidth) * 25,  levelWidth.length * 180]);
+            treemap(hierarchicalRoot);
+            var rootDescendants = hierarchicalRoot.descendants(),
+                links = hierarchicalRoot.descendants().slice(1);
+            // Normalize for fixed-depth.
+            rootDescendants.forEach(function(d){ d.y = d.depth * 200});
+
+            var node = canvasInnerWrapper.selectAll(".node")
+                .data(rootDescendants, function(d) { return d.id || (d.id = ++i); });
+
+            var nodeEnter = node.enter().append("g")
+                .call(dragListener)
+                .attr("class", function(d) { return "node" + (d.children || d._children ? " node--internal" : " node--leaf"); })
+                .attr("transform", function(d) {
+                    return "translate(" + source.y0 + "," + source.x0 + ")";
+                })
+                .on('click', click);
+
+            nodeEnter.append("circle")
+                .transition(t)
+                .attr("r", 4)
+                .attr('cursor', function(d) {
+                    return d.children || d._children ? "pointer" : "default";
+                })
+                .style("fill", function(d) {
+                    return d._children ? "lightsteelblue" : "#fff";
+                });
+
+            nodeEnter.append("text")
+                .transition(t)
+                .attr("dy", "0.31em")
+                .attr("x", function(d) {
+                    return d.children || d._children ? -10 : 10;
+                })
+                .style("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+                .text(function(d) {
+                    return d.data.key + ' (' + d3.format(".2s")(d.value) + ')';
+                })
+                .style("font-size", "10");
+            // phantom node to give us mouseover in a radius around it
+            nodeEnter.append("circle")
+                .attr('class', 'ghostCircle')
+                .attr("r", 20)
+                .attr("opacity", 0.2) // change this to zero to hide the target area
+                .style("fill", "red")
+                .attr('pointer-events', 'mouseover')
+                .on("mouseover", function(node) {
+                    overCircle(node);
+                })
+                .on("mouseout", function(node) {
+                    outCircle(node);
+                });
+
+            var nodeUpdate = nodeEnter.merge(node);
+            // Transition to the proper position for the node
+            nodeUpdate.transition(t)
+                .attr("transform", function(d) {
+                    return "translate(" + d.y + "," + d.x + ")";
+                });
+
+            // Update the node attributes and style
+            nodeUpdate.select('circle')
+                .attr('r', 4)
+                .style("fill", function(d) {
+                    return d._children ? "lightsteelblue" : "#fff";
+                })
+                .attr('cursor', function(d) {
+                    return d.children || d._children ? "pointer" : "default";
+                });
+
+            // Remove any exiting nodes
+            var nodeExit = node
+                .exit()
+                .transition(t)
+                .attr("transform", function(d) {
+                    return "translate(" + source.y + "," + source.x + ")";
+                })
+                .remove();
+
+            // On exit reduce the node circles size to 0
+            nodeExit.select('circle')
+                .attr('r', 0);
+
+            // On exit reduce the opacity of text labels
+            nodeExit.select('text')
+                .style('fill-opacity', 0);
+
+            // Update the links...
+            var link = canvasInnerWrapper.selectAll('.link')
+                .data(links, function(d) { return d.id || (d.id = ++i); });
+
+            // Enter any new links at the parent's previous position.
+            var linkEnter = link.enter().insert('path', "g")
+                .attr("class", "link")
+                .attr('d', function(d){
+                    var o = {x: source.x0, y: source.y0};
+                    return linkedPath(o, o)
+                });
+
+            // UPDATE
+            var linkUpdate = linkEnter.merge(link);
+
+            // Transition back to the parent element position
+            linkUpdate.transition(t)
+                .attr('d', function(d){ return linkedPath(d.parent, d) });
+
+            // Remove any exiting links
+            var linkExit = link.exit()
+                .transition(t)
+                .attr('d', function(d) {
+                    var o = {x: source.x, y: source.y};
+                    return linkedPath(o, o);
+                })
+                .remove();
+
+            // Store the old positions for transition.
+            rootDescendants.forEach(function(d){
+                d.x0 = d.x;
+                d.y0 = d.y;
+            });
+        }
+
+        function updateDimensions() {
+            chartContainerInnerWidth = chartContainer.offsetWidth;
+            margin = chartContainerInnerWidth > breakPoint ? {top: 20, right: 100, bottom: 30, left: 200} : {top: 20, right: 0, bottom: 30, left: 0};
+            width = chartContainerInnerWidth > 960 ? chartContainerInnerWidth : (chartContainerInnerWidth > breakPoint ? breakPoint : chartContainerInnerWidth);
+            width = width - parseFloat(getComputedStyle(chartContainer).paddingLeft) - parseFloat(getComputedStyle(chartContainer).paddingRight);
+            height = 0.6 * width;
+            innerHeight = height - margin.top - margin.bottom;
+            chartPlotAreaInnerWidth = width - margin.left - margin.right;
+            svg.attr('height', height)
+                .attr('width', width);
+            canvasInnerWrapper.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+            treemap.size([innerHeight,  chartPlotAreaInnerWidth]);
+            hierarchicalRoot.children.forEach(collapse);
+            hierarchicalRoot.x0 = innerHeight / 2;
+            hierarchicalRoot.y0 = 0;
+        }
+
+        function linkedPath(source, target) {
+            if (!source && !target) {
+                return null;
+            }
+            return "M" + source.y + "," + source.x
+                + " C" + (source.y + target.y) / 2 + "," + source.x
+                + " " + (source.y + target.y) / 2 + "," + target.x
+                + " " + target.y + "," + target.x;
+        }
+
+        function collapse(d) {
+            if(d.children) {
+                d._children = d.children;
+                d._children.forEach(collapse);
+                delete d.children;
+            }
+        }
+
+        function click(d) {
+            if (!(d.children || d._children)) {
+                event.preventDefault();
+                return false;
+            }
+            if (d.children) {
+                d._children = d.children;
+                delete d.children;
+            } else {
+                d.children = d._children;
+                delete d._children;
+            }
+            drawCompleteChart(d);
+        }
+
+        function expand(d) {
+            if (d._children) {
+                d.children = d._children;
+                d.children.forEach(expand);
+                delete d._children;
+            }
+        }
+
+        function overCircle(d) {
+            selectedNode = d;
+            updateTempConnector();
+        }
+
+        function outCircle(d) {
+            selectedNode = null;
+            updateTempConnector();
+        }
+
+        // Function to update the temporary connector indicating dragging affiliation
+        function updateTempConnector() {
+            var data = [{}];
+            if (draggingNode !== null && selectedNode !== null) {
+                // have to flip the source coordinates since we did this for the existing connectors on the original tree
+                data = {
+                    source: {
+                        x: selectedNode.y0,
+                        y: selectedNode.x0
+                    },
+                    target: {
+                        x: draggingNode.y0,
+                        y: draggingNode.x0
+                    }
+                };
+            }
+            var link = canvasInnerWrapper.selectAll(".templink")
+                .data(data, function(d) { return d.id || (d.id = ++i);});
+
+            link.enter().append("path")
+                .attr("class", "templink")
+                .attr('d', function(d){
+                    return linkedPath(d.source, d.source)
+                })
+                .attr('pointer-events', 'none');
+
+            link.attr("d", function(d){ return linkedPath(d.target, d.source) });
+
+            link.exit().remove();
         }
     }
 })();

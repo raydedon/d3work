@@ -21,8 +21,8 @@
         "description": "Customize the chart. User would be able to select the subset of data and also change the styling of the chart on the fly."
     }, {
         "name": "Hierarchy Chart with Drag & Drop",
-        "type": "HIERARCHY_DRAG_DROP",
-        "imageURL": "/images/line.png",
-        "description": "It is a employee hierarchy chart with drag and drop feature."
+        "type": "HIERARCHY",
+        "imageURL": "/images/hierarchy.png",
+        "description": "It is a Sales hierarchy chart with drag and drop feature."
     }
 ]

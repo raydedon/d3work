@@ -127,3 +127,48 @@ svg {
     stroke-opacity: 0.4;
     stroke-width: 1.5px;
 }
+
+.node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+
+.node text {
+    font: 12px sans-serif;
+}
+
+.link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 2px;
+}
+
+.node {
+    cursor: pointer;
+}
+
+.overlay{
+    background-color:#EEE;
+}
+
+.templink {
+    fill: none;
+    stroke: red;
+    stroke-width: 3px;
+}
+
+.ghostCircle.show{
+    display:block;
+}
+
+.ghostCircle, .activeDrag .ghostCircle{
+    display: none;
+}
+
+.back-shadow {
+    -webkit-box-shadow: 0px 0px 21px 9px rgba(0,0,0,0.61);
+    -moz-box-shadow: 0px 0px 21px 9px rgba(0,0,0,0.61);
+    box-shadow: 0px 0px 21px 9px rgba(0,0,0,0.61);
+    min-height: 200px;
+}
