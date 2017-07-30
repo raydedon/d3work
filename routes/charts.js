@@ -53,6 +53,10 @@ router.get('/customize', function(req, res, next) {
     });
 });
 
+router.get('/line', function(req, res, next) {
+    res.status(200).json({status:"ok"})
+});
+
 /*
 router.get('/line', function(req, res, next) {
     var file = path.join(__dirname, '../data', 'flare.csv');
