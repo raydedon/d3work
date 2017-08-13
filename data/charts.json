@@ -15,14 +15,29 @@
         "imageURL": "/images/line.png",
         "description": "It is line chart. But all the datapoints are not shown in one shot. It adds data points in iteration."
     }, {
-        "name": "Customize Chart",
-        "type": "CUSTOMIZE",
-        "imageURL": "/images/line.png",
-        "description": "Customize the chart. User would be able to select the subset of data and also change the styling of the chart on the fly."
-    }, {
-        "name": "Hierarchy Chart with Drag & Drop",
+        "name": "Hierarchy Chart",
         "type": "HIERARCHY",
         "imageURL": "/images/hierarchy.png",
         "description": "It is a Sales hierarchy chart with drag and drop feature."
+    }, {
+        "name": "Chord Chart",
+        "type": "CHORD",
+        "imageURL": "/images/chord.png",
+        "description": "This chart helps in analyzing the frequency of rides between various neighborhoods in San Francisco."
+    }, {
+        "name": "Force Chart",
+        "type": "FORCE",
+        "imageURL": "/images/force.png",
+        "description": "It is a Hierarchy chart with Forced layout."
+    }, {
+        "name": "Stacked Chart",
+        "type": "STACKED",
+        "imageURL": "/images/stacked.png",
+        "description": "It is a Stacked vs Grouped chart."
+    }, {
+        "name": "Tree Map Chart",
+        "type": "TREE_MAP",
+        "imageURL": "/images/tree_map.png",
+        "description": "It is a zoomable Tree map, which depicts World Population."
     }
 ]

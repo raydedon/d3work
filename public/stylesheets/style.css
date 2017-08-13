@@ -172,3 +172,11 @@ svg {
     box-shadow: 0px 0px 21px 9px rgba(0,0,0,0.61);
     min-height: 200px;
 }
+
+.img-thumbnail.height-200 {
+    height: 200px;
+    min-width: 100%;
+}
+.chart-card {
+    min-height: 360px;
+}
