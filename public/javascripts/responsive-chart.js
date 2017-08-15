@@ -2123,6 +2123,7 @@
             })
             .enter().append("path")
             .attr("d", ribbon)
+            .attr("class", "ribbon-path")
             .style("fill", function (d) {
                 return cities[d.target.index].color;
             })
@@ -2131,7 +2132,7 @@
             });
 
         function mouseover(d, i) {
-            ribbons.classed("fade", function(p) {
+            ribbons.classed("path-faded-away", function(p) {
                 return p.source.index != i && p.target.index != i;
             });
         }
@@ -2159,7 +2160,173 @@
         }
     }
 
-    rc.models.forceChart = (obj) => {}
+    rc.models.forceChart = (obj) => {
+        // fix the id issue with the data.
+        let breakPoint = 768,
+            chartContainer = rc.utils.getChartContainer(obj),
+            chartContainerInnerWidth, chartPlotAreaInnerWidth, svg, margin, width, height, innerHeight, simulation,
+            root = d3.hierarchy(obj.unProcessedDataArray, function(d) {
+                return d.children;
+            }).sum(function(d) {
+                return d.size;
+            }).sort(function(a, b) {
+                return b.value - a.value;
+            }),
+            totalValue = 15/root.value,
+            nodeSvg, linkSvg;
+        d3.select(chartContainer).html('');
+        svg = d3.select(chartContainer).append('svg');
+        let canvasInnerWrapper = svg.append('g');
+        updateDimensions();
+
+        function update() {
+            var nodes = root.descendants(),
+                links = root.links();
+            linkSvg = canvasInnerWrapper.selectAll(".link")
+                .data(links, function(d) {
+                    return d.target.id;
+                })
+
+            linkSvg.exit().remove();
+
+            var linkEnter = linkSvg.enter()
+                .append("line")
+                .attr("class", "link");
+
+            linkSvg = linkEnter.merge(linkSvg)
+
+            nodeSvg = canvasInnerWrapper.selectAll(".node")
+                .data(nodes, function(d) {
+                    return d.id;
+                });
+
+            nodeSvg.exit().remove();
+
+            var nodeEnter = nodeSvg.enter()
+                .append("g")
+                .attr("class", "node")
+                .on("mouseover", function() {
+                    var t = d3.transition()
+                        .duration(500)
+                        .ease(d3.easeLinear);
+                    d3.select(this).select('text')
+                        .transition(t)
+                        .style('display', 'block');
+                })
+                .on("mouseout", function() {
+                    var t = d3.transition()
+                        .duration(500)
+                        .ease(d3.easeLinear);
+                    d3.select(this).select('text')
+                        .transition(t)
+                        .style('display', 'none');
+                })
+                .on("click", click)
+                .call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended))
+
+            nodeEnter.append("circle")
+                .attr("r", function(d) {
+                    return d.value * totalValue + 4;
+                });
+
+            nodeEnter.append("text")
+                .attr('stroke', '#232323')
+                .attr("dy", 3)
+                .attr("x", function(d) { return d.children ? -8 : 8; })
+                .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+                .style('display', 'none')
+                .text(function(d) { return d.data.name + ' (' + d.value + ')'; });
+
+            nodeSvg = nodeEnter.merge(nodeSvg);
+            nodeSvg.select('circle')
+                .style("fill", color);
+
+            simulation
+                .nodes(nodes)
+                .force("collide", d3.forceCollide().strength(.5).radius(function(d) {
+                    return d.value * totalValue + 4;
+                }));
+
+            simulation.force("link")
+                .links(links);
+
+        }
+
+        function zoomed() {
+            canvasInnerWrapper.attr("transform", d3.event.transform);
+        }
+
+        function ticked() {
+            if(linkSvg)
+                linkSvg
+                    .attr("x1", function(d) { return d.source.x; })
+                    .attr("y1", function(d) { return d.source.y; })
+                    .attr("x2", function(d) { return d.target.x; })
+                    .attr("y2", function(d) { return d.target.y; });
+
+            if(nodeSvg)
+                nodeSvg
+                    .attr("transform", function(d) { return "translate(" + d.x + ", " + d.y + ")"; });
+        }
+
+        function click (d) {
+            if (d.children) {
+                d._children = d.children;
+                d.children = null;
+            } else {
+                d.children = d._children;
+                d._children = null;
+            }
+            update();
+            simulation.restart();
+        }
+
+        function dragstarted(d) {
+            if (!d3.event.active) simulation.alphaTarget(0.3).restart()
+        }
+
+        function dragged(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+
+        function dragended(d) {
+            if (!d3.event.active) simulation.alphaTarget(0);
+            d.fx = undefined;
+            d.fy = undefined;
+        }
+
+        function color(d) {
+            return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
+        }
+
+        function updateDimensions() {
+            chartContainerInnerWidth = chartContainer.offsetWidth - 30;
+            margin = chartContainerInnerWidth > breakPoint ? {top: 20, right: 20, bottom: 20, left: 20} : {top: 20, right: 0, bottom: 20, left: 0};
+            width = chartContainerInnerWidth > 960 ? 960 : (chartContainerInnerWidth > breakPoint ? breakPoint : chartContainerInnerWidth);
+            width = width - parseFloat(getComputedStyle(chartContainer).paddingLeft) - parseFloat(getComputedStyle(chartContainer).paddingRight);
+            height = 0.6 * width;
+            innerHeight = height - margin.top - margin.bottom;
+            chartPlotAreaInnerWidth = width - margin.left - margin.right;
+            svg.attr('height', height)
+                .attr('width', width)
+                .call(d3.zoom().scaleExtent([1 / 2, 8]).on("zoom", zoomed));
+            canvasInnerWrapper.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+            simulation = d3.forceSimulation()
+                .force("link", d3.forceLink().id(function(d) {
+                    return d.id;
+                }))
+                .force("charge", d3.forceManyBody())
+                .force("center", d3.forceCenter(chartPlotAreaInnerWidth / 2, innerHeight / 2))
+                .force("x", d3.forceX())
+                .force("y", d3.forceY())
+                .on("tick", ticked),
+            update();
+        }
+    }
 
     rc.models.stackedChart = (obj) => {}
 

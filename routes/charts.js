@@ -1,15 +1,15 @@
 /**
  * Created by Ray on 7/16/2017.
  */
-var express = require('express');
-var router = express.Router();
-var fs = require('fs');
-var path = require("path");
-var d3 = require('d3');
+let express = require('express');
+let router = express.Router();
+let fs = require('fs');
+let path = require("path");
+let d3 = require('d3');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-    var file = path.join(__dirname, '../data', 'charts.json');
+    let file = path.join(__dirname, '../data', 'charts.json');
     fs.readFile(file, 'utf8', function (err, data) {
         if (err) {
             console.log('Error: ' + err);
@@ -21,7 +21,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/combined', function(req, res, next) {
-    var file = path.join(__dirname, '../data', 'superstore-sample-data.tsv');
+    let file = path.join(__dirname, '../data', 'superstore-sample-data.tsv');
     fs.readFile(file, 'utf8', function (err, data) {
         if (err) {
             console.log('Error: ' + err);
@@ -32,7 +32,7 @@ router.get('/combined', function(req, res, next) {
 });
 
 router.get('/cluster', function(req, res, next) {
-    var file = path.join(__dirname, '../data', 'flare.csv');
+    let file = path.join(__dirname, '../data', 'flare.csv');
     fs.readFile(file, 'utf8', function (err, data) {
         if (err) {
             console.log('Error: ' + err);
@@ -43,7 +43,7 @@ router.get('/cluster', function(req, res, next) {
 });
 
 router.get('/customize', function(req, res, next) {
-    var file = path.join(__dirname, '../data', 'superstore-sample-data.tsv');
+    let file = path.join(__dirname, '../data', 'superstore-sample-data.tsv');
     fs.readFile(file, 'utf8', function (err, data) {
         if (err) {
             console.log('Error: ' + err);
@@ -58,7 +58,7 @@ router.get('/line', function(req, res, next) {
 });
 
 router.get('/hierarchy', function(req, res, next) {
-    var file = path.join(__dirname, '../data', 'salesHeirarchicalData.tsv');
+    let file = path.join(__dirname, '../data', 'salesHeirarchicalData.tsv');
     fs.readFile(file, 'utf8', function (err, data) {
         if (err) {
             console.log('Error: ' + err);
@@ -69,7 +69,7 @@ router.get('/hierarchy', function(req, res, next) {
 });
 
 router.get('/chord', function(req, res, next) {
-    var file = path.join(__dirname, '../data', 'chordChart.json');
+    let file = path.join(__dirname, '../data', 'chordChart.json');
     fs.readFile(file, 'utf8', function (err, data) {
         if (err) {
             console.log('Error: ' + err);
@@ -80,18 +80,18 @@ router.get('/chord', function(req, res, next) {
 });
 
 router.get('/force', function(req, res, next) {
-    var file = path.join(__dirname, '../data', 'salesHeirarchicalData.tsv');
+    let file = path.join(__dirname, '../data', 'forceLayoutJSON.json');
     fs.readFile(file, 'utf8', function (err, data) {
         if (err) {
             console.log('Error: ' + err);
             return;
         }
-        res.json(d3.tsvParse(data));
+        res.json(JSON.parse(data));
     });
 });
 
 router.get('/stacked', function(req, res, next) {
-    var file = path.join(__dirname, '../data', 'salesHeirarchicalData.tsv');
+    let file = path.join(__dirname, '../data', 'salesHeirarchicalData.tsv');
     fs.readFile(file, 'utf8', function (err, data) {
         if (err) {
             console.log('Error: ' + err);
@@ -102,7 +102,7 @@ router.get('/stacked', function(req, res, next) {
 });
 
 router.get('/treemap', function(req, res, next) {
-    var file = path.join(__dirname, '../data', 'salesHeirarchicalData.tsv');
+    let file = path.join(__dirname, '../data', 'salesHeirarchicalData.tsv');
     fs.readFile(file, 'utf8', function (err, data) {
         if (err) {
             console.log('Error: ' + err);
