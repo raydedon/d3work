@@ -68,4 +68,48 @@ router.get('/hierarchy', function(req, res, next) {
     });
 });
 
+router.get('/chord', function(req, res, next) {
+    var file = path.join(__dirname, '../data', 'chordChart.json');
+    fs.readFile(file, 'utf8', function (err, data) {
+        if (err) {
+            console.log('Error: ' + err);
+            return;
+        }
+        res.json(JSON.parse(data));
+    });
+});
+
+router.get('/force', function(req, res, next) {
+    var file = path.join(__dirname, '../data', 'salesHeirarchicalData.tsv');
+    fs.readFile(file, 'utf8', function (err, data) {
+        if (err) {
+            console.log('Error: ' + err);
+            return;
+        }
+        res.json(d3.tsvParse(data));
+    });
+});
+
+router.get('/stacked', function(req, res, next) {
+    var file = path.join(__dirname, '../data', 'salesHeirarchicalData.tsv');
+    fs.readFile(file, 'utf8', function (err, data) {
+        if (err) {
+            console.log('Error: ' + err);
+            return;
+        }
+        res.json(d3.tsvParse(data));
+    });
+});
+
+router.get('/treemap', function(req, res, next) {
+    var file = path.join(__dirname, '../data', 'salesHeirarchicalData.tsv');
+    fs.readFile(file, 'utf8', function (err, data) {
+        if (err) {
+            console.log('Error: ' + err);
+            return;
+        }
+        res.json(d3.tsvParse(data));
+    });
+});
+
 module.exports = router;

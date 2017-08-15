@@ -36,7 +36,7 @@
         "description": "It is a Stacked vs Grouped chart."
     }, {
         "name": "Tree Map Chart",
-        "type": "TREE_MAP",
+        "type": "TREEMAP",
         "imageURL": "/images/tree_map.png",
         "description": "It is a zoomable Tree map, which depicts World Population."
     }

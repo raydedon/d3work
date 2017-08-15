@@ -180,3 +180,19 @@ svg {
 .chart-card {
     min-height: 360px;
 }
+
+.mb-100 {
+    margin-bottom: 100px;
+}
+
+.chord-chart .group-tick line {
+    stroke: #000;
+}
+
+.chord-chart .ribbons {
+    fill-opacity: 0.67;
+}
+
+.chord-chart .circle:hover path.fade {
+    display: none;
+}

@@ -109,6 +109,18 @@
             case 'hierarchy':
                 rc.models.hierarchyChart(obj);
                 break;
+            case 'chord':
+                rc.models.chordChart(obj);
+                break;
+            case 'force':
+                rc.models.forceChart(obj);
+                break;
+            case 'stacked':
+                rc.models.stackedChart(obj);
+                break;
+            case 'treemap':
+                rc.models.treeMapChart(obj);
+                break;
             default:
                 rc.models.combinedChart(obj);
         }
@@ -1002,7 +1014,7 @@
             unProcessedDataArray = [],
             processedData = [],
             prevYaxisOrient = (chartContainerInnerWidth > breakPoint) ? 'left' : 'right';
-            updateDimensions();
+        updateDimensions();
         var line = d3.line()
             .curve(d3.curveLinear)
             .x(function(d) {
@@ -1967,4 +1979,189 @@
             link.exit().remove();
         }
     }
+
+    /*
+        rc.models.chordChart = (obj) => {
+            let width = 960,
+                height = 700,
+                svg = d3.select("svg")
+                    .attr("width", width)
+                    .attr("height", height),
+                outerRadius = Math.min(width, height) / 2 - 10,
+                innerRadius = outerRadius - 24,
+                chord = d3.chord()
+                    .padAngle(0.04)
+                    .sortSubgroups(d3.descending),
+                arc = d3.arc()
+                    .innerRadius(innerRadius)
+                    .outerRadius(outerRadius),
+                ribbon = d3.ribbon()
+                    .radius(innerRadius);
+
+            queue()
+                .defer(d3.csv, "https://bost.ocks.org/mike/uberdata/cities.csv")
+                .defer(d3.json, "https://bost.ocks.org/mike/uberdata/matrix.json")
+                .await(ready);
+
+            function ready(error, cities, matrix) {
+                if (error) throw error;
+
+                let g = svg.append("g")
+                    .attr("class", "circle")
+                    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+                    .datum(chord(matrix));
+
+                let group = g.append("g")
+                    .attr("class", "groups")
+                    .selectAll("g")
+                    .data(function (chords) {
+                        return chords.groups;
+                    })
+                    .enter().append("g")
+                    .on("mouseover", mouseover);
+                let groupPath = group.append("path")
+                    .style("fill", function (d) {
+                        return cities[d.index].color;
+                    })
+                    .style("stroke", function (d) {
+                        return d3.rgb(cities[d.index].color).darker();
+                    })
+                    .attr("id", function(d, i) { return "group" + i; })
+                    .attr("d", arc);
+
+                let groupText = group.append("text")
+                    .attr("x", 6)
+                    .attr("dy", 15);
+
+                groupText.append("textPath")
+                    .attr("xlink:href", function(d, i) { return "#group" + i; })
+                    .text(function(d, i) { return cities[i].name; });
+
+                // Remove the labels that don't fit. :(
+                groupText.filter(function(d, i) {
+                    return groupPath._groups[0][i].getTotalLength() / 2 - 16 < this.getComputedTextLength();
+                })
+                    .remove();
+
+                let ribbons = g.append("g")
+                    .attr("class", "ribbons")
+                    .selectAll("path")
+                    .data(function (chords) {
+                        return chords;
+                    })
+                    .enter().append("path")
+                    .attr("d", ribbon)
+                    .style("fill", function (d) {
+                        return cities[d.target.index].color;
+                    })
+                    .style("stroke", function (d) {
+                        return d3.rgb(cities[d.target.index].color).darker();
+                    });
+
+                function mouseover(d, i) {
+                    ribbons.classed("fade", function(p) {
+                        return p.source.index != i && p.target.index != i;
+                    });
+                }
+            }
+        }
+    */
+
+    rc.models.chordChart = (obj) => {
+        var breakPoint = 768,
+            chartContainer = rc.utils.getChartContainer(obj),
+            chartContainerInnerWidth, chartPlotAreaInnerWidth, svg, margin, width, height, innerHeight, outerRadius,
+            innerRadius,
+            arc, ribbon,
+            cities = obj.unProcessedDataArray.cities,
+            matrix = obj.unProcessedDataArray.matrix;
+        d3.select(chartContainer).html('');
+        svg = d3.select(chartContainer).append('svg');
+        let canvasInnerWrapper = svg.append('g'),
+            chord = d3.chord()
+                .padAngle(0.04)
+                .sortSubgroups(d3.descending);
+        updateDimensions();
+
+        let group = canvasInnerWrapper.append("g")
+            .attr("class", "groups")
+            .selectAll("g")
+            .data(function (chords) {
+                return chords.groups;
+            })
+            .enter().append("g")
+            .on("mouseover", mouseover);
+        let groupPath = group.append("path")
+            .style("fill", function (d) {
+                return cities[d.index].color;
+            })
+            .style("stroke", function (d) {
+                return d3.rgb(cities[d.index].color).darker();
+            })
+            .attr("id", function(d, i) { return "group" + i; })
+            .attr("d", arc);
+
+        let groupText = group.append("text")
+            .attr("x", 6)
+            .attr("dy", 15);
+
+        groupText.append("textPath")
+            .attr("xlink:href", function(d, i) { return "#group" + i; })
+            .text(function(d, i) { return cities[i].name; });
+
+        // Remove the labels that don't fit. :(
+        groupText.filter(function(d, i) {
+            return groupPath._groups[0][i].getTotalLength() / 2 - 16 < this.getComputedTextLength();
+        })
+            .remove();
+
+        let ribbons = canvasInnerWrapper.append("g")
+            .attr("class", "ribbons")
+            .selectAll("path")
+            .data(function (chords) {
+                return chords;
+            })
+            .enter().append("path")
+            .attr("d", ribbon)
+            .style("fill", function (d) {
+                return cities[d.target.index].color;
+            })
+            .style("stroke", function (d) {
+                return d3.rgb(cities[d.target.index].color).darker();
+            });
+
+        function mouseover(d, i) {
+            ribbons.classed("fade", function(p) {
+                return p.source.index != i && p.target.index != i;
+            });
+        }
+
+        function updateDimensions() {
+            chartContainerInnerWidth = chartContainer.offsetWidth - 30;
+            margin = chartContainerInnerWidth > breakPoint ? {top: 20, right: 20, bottom: 20, left: 20} : {top: 20, right: 0, bottom: 20, left: 0};
+            width = chartContainerInnerWidth > 960 ? 960 : (chartContainerInnerWidth > breakPoint ? breakPoint : chartContainerInnerWidth);
+            width = width - parseFloat(getComputedStyle(chartContainer).paddingLeft) - parseFloat(getComputedStyle(chartContainer).paddingRight);
+            height = 1 * width;
+            innerHeight = height - margin.top - margin.bottom;
+            chartPlotAreaInnerWidth = width - margin.left - margin.right;
+            svg.attr('height', height)
+                .attr('width', width);
+            outerRadius = Math.min(chartPlotAreaInnerWidth, innerHeight) / 2 - 10;
+            innerRadius = outerRadius - 24;
+            arc = d3.arc()
+                .innerRadius(innerRadius)
+                .outerRadius(outerRadius);
+            ribbon = d3.ribbon()
+                .radius(innerRadius);
+            canvasInnerWrapper.attr("class", "circle")
+                .attr("transform", "translate(" + chartPlotAreaInnerWidth / 2 + "," + innerHeight / 2 + ")")
+                .datum(chord(matrix));
+        }
+    }
+
+    rc.models.forceChart = (obj) => {}
+
+    rc.models.stackedChart = (obj) => {}
+
+    rc.models.treeMapChart = (obj) => {}
 })();
