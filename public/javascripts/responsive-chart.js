@@ -2330,5 +2330,149 @@
 
     rc.models.stackedChart = (obj) => {}
 
-    rc.models.treeMapChart = (obj) => {}
+    rc.models.treeMapChart = (obj) => {
+        let breakPoint = 768,
+            chartContainer = rc.utils.getChartContainer(obj),
+            chartContainerInnerWidth, chartPlotAreaInnerWidth, svg, margin, width, height, innerHeight, simulation,
+            root = hierarchyChart({key: 'World', values: d3.nest().key(function(d) { return d.region; }).key(function(d) { return d.subregion; }).entries(obj.unProcessedDataArray)});
+        root.children.forEach(collapse);
+        d3.select(chartContainer).html('');
+        svg = d3.select(chartContainer).append('svg');
+        let canvasInnerWrapper = svg.append('g');
+        updateDimensions();
+        let treemap = d3.treemap()
+            .tile(d3.treemapResquarify)
+            .size([width, height])
+            .round(true)
+            .paddingInner(1);
+        treemap(root);
+        let aggregatedGroup = canvasInnerWrapper.append('g')
+            .attr('class', 'aggregate');
+        aggregatedGroup.append("rect")
+            .attr("y", -margin.top)
+            .attr("width", width)
+            .attr("height", margin.top);
+
+        aggregatedGroup.append("text")
+            .attr("x", 6)
+            .attr("y", 6 - margin.top)
+            .attr("dy", ".75em");
+        let childrenGroup = canvasInnerWrapper.append('g')
+            .attr('class', 'children');
+        display(root);
+
+        function hierarchyChart(obj) {
+            return d3.hierarchy(obj, function(d) {
+                return d.values;
+            }).sum(function(d) {
+                return d.value;
+            }).eachBefore(function(d) {
+                d.data.id = (d.parent ? d.parent.data.id + "." : "") + d.data.key;
+                d._children = d.children;
+            }).sort(function(a, b) { return b.height - a.height || b.value - a.value; });
+        }
+
+        function display(treeRoot) {
+            let fader = function(color) { return d3.interpolateRgb(color, "#fff")(0.2); },
+                color = d3.scaleOrdinal(d3.schemeCategory10.map(fader)),
+                format = d3.format(",d"),
+                t = d3.transition()
+                    .duration(500)
+                    .ease(d3.easeLinear);
+
+            let aggregatedGroup = canvasInnerWrapper.select('g.aggregate');
+            aggregatedGroup.datum(treeRoot)
+                .on("click", transitionParent)
+                .select('rect')
+                .attr("fill", function(d) {
+                    return color(d.data.id);
+                });
+            aggregatedGroup.select('text')
+                .text(function(d) {
+                    return name(d);
+                });
+
+            let cell = canvasInnerWrapper.select('g.children').selectAll("g")
+                .data(treeRoot.leaves());
+
+            let newCells = cell.enter().append("g");
+
+            let allCells = newCells.merge(cell)
+                .on("click", expandChild)
+                .transition(t)
+                .attr("transform", function(d) {
+                    return "translate(" + d.x0 + "," + d.y0 + ")";
+                });
+
+            newCells.append("rect");
+            newCells.append("text")
+                .attr("x", 6)
+                .attr("y", 20);
+
+            cell.exit().remove();
+
+
+            allCells.select('rect').attr("id", function(d) {
+                return d.data.id;
+            })
+                .attr("width", function(d) {
+                    return d.x1 - d.x0;
+                })
+                .attr("height", function(d) {
+                    return d.y1 - d.y0;
+                })
+                .attr("fill", function(d) {
+                    return color(d.data.id);
+                });
+
+            allCells.select('text').text(function(d) {
+                return d.data.key + ' (' + format(d.value) + ')';
+            });
+
+            function name(d) {
+                return d.parent
+                    ? name(d.parent) + " / " + d.data.key + " (" + format(d.value) + ")"
+                    : d.data.key + " (" + format(d.value) + ")";
+            }
+        }
+
+        function transitionParent(aggregateChildren) {
+            if(!aggregateChildren.parent) return;
+            display(aggregateChildren.parent);
+        }
+
+        function expandChild(parentRoot) {
+            if(parentRoot.height === 0) return;
+            let treemap = d3.treemap()
+                .tile(d3.treemapResquarify)
+                .size([width, height])
+                .round(true)
+                .paddingInner(1);
+            let childTreeRoot = hierarchyChart(parentRoot.data);
+            childTreeRoot.children.forEach(collapse);
+            treemap(childTreeRoot);
+            childTreeRoot.parent = parentRoot.parent;
+            display(childTreeRoot);
+        }
+
+        function collapse(d) {
+            if(d.children) {
+                d._children = d.children;
+                d._children.forEach(collapse);
+                delete d.children;
+            }
+        }
+
+        function updateDimensions() {
+            chartContainerInnerWidth = chartContainer.offsetWidth - 30;
+            margin = {top: 24, right: 0, bottom: 0, left: 0};
+            width = chartContainerInnerWidth > 960 ? 960 : (chartContainerInnerWidth > breakPoint ? breakPoint : chartContainerInnerWidth);
+            width = width - parseFloat(getComputedStyle(chartContainer).paddingLeft) - parseFloat(getComputedStyle(chartContainer).paddingRight);
+            height = 0.6 * width;
+            svg.attr('height', height)
+                .attr('width', width);
+            canvasInnerWrapper.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
+                .style("shape-rendering", "crispEdges");
+        }
+    }
 })();

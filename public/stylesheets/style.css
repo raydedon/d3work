@@ -208,3 +208,42 @@ svg {
     stroke: #9ecae1;
     stroke-width: 1px;
 }
+
+
+.treemap-chart .title {
+    font-weight: bold;
+    font-size: 24px;
+    text-align: center;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+.treemap-chart text {
+    pointer-events: none;
+}
+.treemap-chart .aggregate text {
+    font-weight: bold;
+}
+.treemap-chart rect.parent,
+.treemap-chart .aggregate rect {
+    stroke-width: 2px;
+}
+.treemap-chart rect.parent {
+    pointer-events: none;
+}
+.treemap-chart .children rect.parent,
+.treemap-chart .aggregate rect {
+    cursor: pointer;
+}
+.treemap-chart .children rect.parent {
+    fill: #bbb;
+    fill-opacity: .5;
+}
+.treemap-chart .children:hover rect.child {
+    fill: #bbb;
+}
+.treemap-chart svg {
+    border: 1px solid #ccc;
+}
+.treemap-chart #generic-chart-container {
+    padding: 10px 0;
+}

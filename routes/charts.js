@@ -102,13 +102,14 @@ router.get('/stacked', function(req, res, next) {
 });
 
 router.get('/treemap', function(req, res, next) {
-    let file = path.join(__dirname, '../data', 'salesHeirarchicalData.tsv');
+    let file = path.join(__dirname, '../data', 'treeMapData.json');
     fs.readFile(file, 'utf8', function (err, data) {
         if (err) {
             console.log('Error: ' + err);
             return;
         }
-        res.json(d3.tsvParse(data));
+        data = JSON.parse(data);
+        res.json(data);
     });
 });
 
