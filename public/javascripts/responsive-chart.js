@@ -162,6 +162,13 @@
         chartContainer.addEventListener('resize', resizeTheChart);
     };
 
+    rc.utils.addCustomEventHandler = function(chartContainer, customEventHandler) {
+        window.addEventListener('customEvent', function(e) {
+            chartContainer.dispatchEvent(new CustomEvent('customEvent'));
+        });
+        chartContainer.addEventListener('customEvent', customEventHandler);
+    };
+
     rc.utils.getAxisLabelColor = (axisObj) => {
         if (axisObj !== undefined && axisObj.labelColor !== undefined && axisObj.labelColor.length !== 0) {
             return axisObj.labelColor;
@@ -187,23 +194,23 @@
     };
 
     rc.utils.getAxisTickWidth = (axisObj) => {
-        rc.utils.getPropValue(axisObj, 'tickWidth', 1);
+        return rc.utils.getPropValue(axisObj, 'tickWidth', 1);
     };
 
     rc.utils.getTickLabelFontSize = (axisObj) => {
-        rc.utils.getPropValue(axisObj, 'tickLabelFontSize', 10);
+        return rc.utils.getPropValue(axisObj, 'tickLabelFontSize', 10);
     };
 
     rc.utils.getTickLength = (axisObj) => {
-        rc.utils.getPropValue(axisObj, 'tickLength', 6);
+        return rc.utils.getPropValue(axisObj, 'tickLength', 6);
     };
 
     rc.utils.getDisplayGridLines = (axisObj) => {
-        rc.utils.getPropValue(axisObj, 'displayGridLines', false);
+        return rc.utils.getPropValue(axisObj, 'displayGridLines', false);
     };
 
     rc.utils.getLayoutType = (obj) => {
-        rc.utils.getPropValue(obj, 'layoutType', 0);
+        return rc.utils.getPropValue(obj, 'layoutType', 0);
     };
 
     rc.models.combinedChart = function(obj) {
@@ -2329,7 +2336,6 @@
             chartContainer = rc.utils.getChartContainer(obj),
             chartContainerInnerWidth, chartPlotAreaInnerWidth, svg, margin, width, height, innerHeight,
             {chartUpdate} = obj;
-
         svg = d3.select(chartContainer).append('svg');
         let canvasInnerWrapper = svg.append('g'),
             scaleX = d3.scaleBand().paddingInner(0.1).paddingOuter(0.03).align(0.1),
@@ -2339,16 +2345,19 @@
             zAxisTicks = d3.set(),
             invisibleSeries = d3.set(),
             processedUnstackedData = [],
-            layoutType = rc.utils.getLayoutType(obj),
+            layoutType = parseInt(rc.utils.getLayoutType(obj)),
             unProcessedDataArray = obj.unProcessedDataArray,
             yGroupMax = 0,
             yStackMax = 0;
 
-        if (!chartUpdate) {
-            updateDimensions();
-        }
+        updateDimensions();
 
         drawCompleteChart(processRawData(unProcessedDataArray), chartUpdate);
+        rc.utils.addCustomEventHandler(chartContainer, customEventHandler);
+
+        function customEventHandler(e) {
+            switchGraphType(parseInt($("input:radio[name=layoutType]:checked").val()));
+        }
 
         function processRawData(data) {
             data = data.map(function(group) {
@@ -2474,21 +2483,21 @@
         }
 
         function drawSeries(seriesData) {
-            var t = d3.transition()
+            let t = d3.transition()
                 .duration(750)
                 .ease(d3.easeLinear);
-            var seriesGroup = canvasInnerWrapper.selectAll(".series")
+            let seriesGroup = canvasInnerWrapper.selectAll(".series")
                 .data(seriesData);
-            seriesGroup.attr("class", "series")
-                .attr("fill", function(d) { return scaleZ(d.key); });
+            seriesGroup.exit().remove(); // EXIT
 
-            seriesGroup.enter().append("g")
+
+            seriesGroup = seriesGroup.enter().append("g")
                 .attr("class", "series")
+                .merge(seriesGroup)
                 .attr("fill", function(d) { return scaleZ(d.key); });
+            seriesGroup.selectAll("*").remove();
 
-            seriesGroup.exit().remove();
-
-            var seriesRect = canvasInnerWrapper.selectAll(".series")
+            var seriesRect = seriesGroup
                 .selectAll("rect")
                 .data(function(d) { return d; });
 
@@ -2505,40 +2514,25 @@
                 .attr("height", function(d) {
                     return layoutType ? height - scaleY(d[1] - d[0]) : scaleY(d[0]) - scaleY(d[1]);
                 })
-                .attr("width", layoutType ? scaleX.bandwidth() / zAxisTicks.values().length : scaleX.bandwidth());
+                .attr("width", (d) => {
+                    return layoutType ? scaleX.bandwidth() / zAxisTicks.values().length : scaleX.bandwidth()
+                });
         }
 
         function drawLegend() {
-            var legend = canvasInnerWrapper.selectAll(".legend")
+            let legend = canvasInnerWrapper.selectAll(".legend")
                 .data(zAxisTicks.values().sort());
+            legend.exit().remove(); // EXIT
 
-            legend.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-            legend.select('rect')
-                .attr("x", chartPlotAreaInnerWidth - 16)
-                .attr("width", 16)
-                .attr("height", 16)
-                .attr("fill", function(d) {
-                    return invisibleSeries.values().indexOf(d) === -1 ? scaleZ(d) : '#ffffff';
-                })
-                .attr("stroke", function(d) {
-                    return scaleZ(d);
-                })
-                .attr("stroke-width", 2);
-            legend.select("text")
-                .attr("x", chartPlotAreaInnerWidth - 24)
-                .attr("y", 9)
-                .attr("dy", ".35em")
-                .attr("text-anchor", "end")
-                .text(function(d) {
-                    return d;
-                });
-
-            var legendEnter = legend.enter().append("g")
+            legend  = legend.enter()
+                .append("g")
                 .attr("class", "legend")
-                .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; })
+                .merge(legend);
+            legend.selectAll("*").remove();
+            legend.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; })
                 .style("font", "10px sans-serif");
 
-            legendEnter.append("rect")
+            legend.append("rect")
                 .attr("x", chartPlotAreaInnerWidth - 16)
                 .attr("width", 16)
                 .attr("height", 16)
@@ -2550,7 +2544,7 @@
                 })
                 .attr("stroke-width", 2);
 
-            legendEnter.append("text")
+            legend.append("text")
                 .attr("x", chartPlotAreaInnerWidth - 24)
                 .attr("y", 9)
                 .attr("dy", ".35em")
@@ -2558,9 +2552,7 @@
                 .text(function(d) {
                     return d;
                 });
-            legend.exit().remove();
 
-            legend = canvasInnerWrapper.selectAll(".legend");
             legend.on('click', function(d) {
                 invisibleSeries.has(d) ? invisibleSeries.remove(d) : invisibleSeries.add(d);
                 drawCompleteChart(calculateStackedData(), true);
@@ -2569,13 +2561,13 @@
 
         function transitionStacked() {
             layoutType = 0;
-            configureLeftAxisScale(scaleY);
-            drawLeftAxis(scaleY, canvas, true);
+            configureLeftAxisScale();
+            drawLeftAxis(true);
             var t = d3.transition()
                 .duration(750)
                 .ease(d3.easeLinear)
                 .delay(function(d, i) { return i * 10; });
-            canvas.selectAll('g.series').selectAll("rect")
+            canvasInnerWrapper.selectAll('g.series').selectAll("rect")
                 .transition(t)
                 .attr("x", function(d, i, j) {
                     return scaleX(d.data.versionID);
@@ -2592,13 +2584,13 @@
 
         function transitionGrouped() {
             layoutType = 1;
-            configureLeftAxisScale(scaleY);
-            drawLeftAxis(scaleY, canvas, true);
+            configureLeftAxisScale();
+            drawLeftAxis(true);
             var t = d3.transition()
                 .duration(750)
                 .ease(d3.easeLinear)
                 .delay(function(d, i) { return i * 10; });
-            canvas.selectAll('g.series').selectAll("rect")
+            canvasInnerWrapper.selectAll('g.series').selectAll("rect")
                 .transition(t)
                 .attr("x", function(d) {
                     return scaleX(d.data.versionID) + scaleX.bandwidth() / zAxisTicks.values().length* zAxisTicks.values().sort().indexOf(d3.select(this.parentNode).data()[0].key);
@@ -2614,7 +2606,7 @@
         }
 
         function switchGraphType(radioBtn) {
-            if (radioBtn.value === 'grouped') {
+            if (radioBtn) {
                 transitionGrouped();
             } else {
                 transitionStacked();
@@ -2635,7 +2627,7 @@
             scaleX.range([0, chartPlotAreaInnerWidth]);
             scaleY.range([innerHeight, 0]);
         }
-    }
+    };
 
     rc.models.treeMapChart = (obj) => {
         let breakPoint = 768,
