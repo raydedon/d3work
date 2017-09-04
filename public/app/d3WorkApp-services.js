@@ -6,7 +6,7 @@ angular.module('d3WorkApp')
         var service = {
             chartList: () => {
                 var defer = $q.defer();
-                $http.get('/charts').success(function(data) {
+                $http.get('/charts').then(function(data) {
                     defer.resolve(data);
                 });
                 return defer.promise;
@@ -14,10 +14,9 @@ angular.module('d3WorkApp')
             chartDataByType: (chartType) => {
                 let defer = $q.defer();
                 $http.get(`/charts/${chartType}`)
-                    .success(function(data) {
+                    .then(function(data) {
                         defer.resolve(data);
-                    })
-                    .error(function() {
+                    }, function(data) {
                         defer.reject("Failed to get chart data");
                     });
                 return defer.promise;

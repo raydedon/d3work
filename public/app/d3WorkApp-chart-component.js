@@ -9,8 +9,21 @@ angular.module('d3WorkApp')
         },
         templateUrl: '../html/chart-component.html',
         controller: ['HttpService', function(HttpService) {
-            this.$onInit = () => {};
+            this.$onInit = () => {
+                this.layoutType = 1;
+            };
             this.$postLink = () => {};
+
+            this.switchLayoutType = () => {
+                rc.addGraph({
+                    chartContainerID: 'generic-chart-container',
+                    unProcessedDataArray: this.chartData,
+                    chartType: this.chartType.toLowerCase(),
+                    chartUpdate: true,
+                    ...this.layoutType
+                });
+            };
+
 
             this.$onChanges = (changes) => {
                 if (changes.chartData && !changes.chartData.isFirstChange()) {

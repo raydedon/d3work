@@ -178,43 +178,39 @@
         }
     };
 
-    rc.utils.getAxisTickWidth = (axisObj) => {
-        if (axisObj !== undefined && axisObj.tickWidth !== undefined) {
-            return axisObj.tickWidth;
+    rc.utils.getPropValue = (obj, propName, defaultValue) => {
+        if (obj !== undefined && obj[propName] !== undefined) {
+            return obj[propName];
         } else {
-            return 1;
+            return defaultValue;
         }
+    };
+
+    rc.utils.getAxisTickWidth = (axisObj) => {
+        rc.utils.getPropValue(axisObj, 'tickWidth', 1);
     };
 
     rc.utils.getTickLabelFontSize = (axisObj) => {
-        if (axisObj !== undefined && axisObj.tickLabelFontSize !== undefined) {
-            return axisObj.tickLabelFontSize;
-        } else {
-            return 10;
-        }
+        rc.utils.getPropValue(axisObj, 'tickLabelFontSize', 10);
     };
 
     rc.utils.getTickLength = (axisObj) => {
-        if (axisObj !== undefined && axisObj.tickLength !== undefined) {
-            return axisObj.tickLength;
-        } else {
-            return 6;
-        }
+        rc.utils.getPropValue(axisObj, 'tickLength', 6);
     };
 
     rc.utils.getDisplayGridLines = (axisObj) => {
-        if (axisObj !== undefined && axisObj.displayGridLines !== undefined) {
-            return Boolean(axisObj.displayGridLines);
-        } else {
-            return false;
-        }
+        rc.utils.getPropValue(axisObj, 'displayGridLines', false);
+    };
+
+    rc.utils.getLayoutType = (obj) => {
+        rc.utils.getPropValue(obj, 'layoutType', 0);
     };
 
     rc.models.combinedChart = function(obj) {
         var breakPoint = 768,
             chartContainer = rc.utils.getChartContainer(obj),
             chartContainerInnerWidth, chartPlotAreaInnerWidth, svg, margin, width, height, innerHeight;
-        d3.select(chartContainer).html('');
+
         svg = d3.select(chartContainer).append('svg');
         var canvasInnerWrapper = svg.append('g'),
             scaleX = d3.scaleBand().paddingInner(0.1).paddingOuter(0.03),
@@ -910,7 +906,7 @@
             chartPlotAreaInnerWidth, svg, margin, width, height,
             unProcessedDataArray = obj.unProcessedDataArray,
             processedData = [];
-        d3.select(chartContainer).html('');
+
         svg = d3.select(chartContainer).append('svg');
         var canvasInnerWrapper = svg.append('g');
         var stratify = d3.stratify()
@@ -1003,7 +999,7 @@
         var breakPoint = 768,
             chartContainer = rc.utils.getChartContainer(obj),
             chartContainerInnerWidth, chartPlotAreaInnerWidth, svg, margin, width, height, innerHeight;
-        d3.select(chartContainer).html('');
+
         svg = d3.select(chartContainer).append('svg');
         let canvasInnerWrapper = svg.append('g'),
             scaleX = d3.scalePoint(),
@@ -1517,7 +1513,7 @@
         // panning variables
         var panSpeed = 200;
         var panBoundary = 20; // Within 20px from edges will pan when dragging.;
-        d3.select(chartContainer).html('');
+
         svg = d3.select(chartContainer).append('svg').call(d3.zoom().scaleExtent([0.1, 3]).on("zoom", zoom));
         var canvasInnerWrapper = svg.append('g');
         var treemap = d3.tree();
@@ -2075,7 +2071,7 @@
             arc, ribbon,
             cities = obj.unProcessedDataArray.cities,
             matrix = obj.unProcessedDataArray.matrix;
-        d3.select(chartContainer).html('');
+
         svg = d3.select(chartContainer).append('svg');
         let canvasInnerWrapper = svg.append('g'),
             chord = d3.chord()
@@ -2174,7 +2170,7 @@
             }),
             totalValue = 15/root.value,
             nodeSvg, linkSvg;
-        d3.select(chartContainer).html('');
+
         svg = d3.select(chartContainer).append('svg');
         let canvasInnerWrapper = svg.append('g');
         updateDimensions();
@@ -2324,11 +2320,322 @@
                 .force("x", d3.forceX())
                 .force("y", d3.forceY())
                 .on("tick", ticked),
-            update();
+                update();
         }
     }
 
-    rc.models.stackedChart = (obj) => {}
+    rc.models.stackedChart = (obj) => {
+        let breakPoint = 768,
+            chartContainer = rc.utils.getChartContainer(obj),
+            chartContainerInnerWidth, chartPlotAreaInnerWidth, svg, margin, width, height, innerHeight,
+            {chartUpdate} = obj;
+
+        svg = d3.select(chartContainer).append('svg');
+        let canvasInnerWrapper = svg.append('g'),
+            scaleX = d3.scaleBand().paddingInner(0.1).paddingOuter(0.03).align(0.1),
+            scaleY = d3.scaleLinear(),
+            scaleZ = (undefined !== obj.series && obj.series.map(function(d) { return d.color; }).length > 0) ? d3.scaleOrdinal().range(obj.series.map(function(d) { return d.color; })) : d3.scaleOrdinal(d3.schemeCategory10),
+            xAxisTicks = d3.set(),
+            zAxisTicks = d3.set(),
+            invisibleSeries = d3.set(),
+            processedUnstackedData = [],
+            layoutType = rc.utils.getLayoutType(obj),
+            unProcessedDataArray = obj.unProcessedDataArray,
+            yGroupMax = 0,
+            yStackMax = 0;
+
+        if (!chartUpdate) {
+            updateDimensions();
+        }
+
+        drawCompleteChart(processRawData(unProcessedDataArray), chartUpdate);
+
+        function processRawData(data) {
+            data = data.map(function(group) {
+                zAxisTicks.add(group.key);
+                return group.values.map(function(d) {
+                    var obj = {};
+                    obj[group.key] = d.value;
+                    obj.versionID = parseFloat(d.key);
+                    xAxisTicks.add(obj.versionID);
+                    return obj;
+                });
+            });
+            data = [].concat.apply([], data);
+            data = d3.nest()
+                .key(function(d) {
+                    return parseFloat(d.versionID);
+                })
+                .sortKeys(d3.ascending)
+                .entries(data);
+            data = data.map(function(group) {
+                var obj = {};
+                group.values.map(function(d) {
+                    return Object.assign(obj, d);
+                });
+                return obj;
+            });
+            /*
+             var data = [
+             {month: new Date(2015, 0, 1), apples: 3840, bananas: 1920, cherries: 960, dates: 400},
+             {month: new Date(2015, 1, 1), apples: 1600, bananas: 1440, cherries: 960, dates: 400},
+             {month: new Date(2015, 2, 1), apples:  640, bananas:  960, cherries: 640, dates: 400},
+             {month: new Date(2015, 3, 1), apples:  320, bananas:  480, cherries: 640, dates: 400}
+             ];
+             */
+            processedUnstackedData = data;
+            return calculateStackedData();
+        }
+
+        function calculateStackedData() {
+            var stack = d3.stack()
+                .keys(zAxisTicks.values().filter(x => invisibleSeries.values().indexOf(x) === -1).sort())
+                .order(d3.stackOrderNone)
+                .offset(d3.stackOffsetNone);
+            /*
+             [
+             [[   0, 3840], [   0, 1600], [   0,  640], [   0,  320]], // apples
+             [[3840, 5760], [1600, 3040], [ 640, 1600], [ 320,  800]], // bananas
+             [[5760, 6720], [3040, 4000], [1600, 2240], [ 800, 1440]], // cherries
+             [[6720, 7120], [4000, 4400], [2240, 2640], [1440, 1840]], // dates
+             ]
+             */
+            var multiSeriesData = stack(processedUnstackedData);
+            yGroupMax = multiSeriesData.length === 0 ? 0 : d3.max(multiSeriesData, function(seriesData) { return d3.max(seriesData, function(d) { return d[1] - d[0]; }); });
+            yStackMax = multiSeriesData.length === 0 ? 0 : d3.max(multiSeriesData[multiSeriesData.length - 1], function(d) { return d[1]; });
+            return multiSeriesData;
+        }
+
+        function drawCompleteChart(stackedData, updateChart = false) {
+            configureAxes();
+            renderAxes(updateChart);
+            drawSeries(stackedData);
+            drawLegend();
+        }
+
+        function renderAxes(updateChart) {
+            drawBottomAxis(updateChart);
+            drawLeftAxis(updateChart);
+        }
+
+        function configureAxes() {
+            configureBottomAxisScale();
+            configureLeftAxisScale();
+            configureSeriesZAxis();
+        }
+
+        function configureLeftAxisScale() {
+            scaleY.domain([0, layoutType ? yGroupMax : yStackMax]);
+        }
+
+        function drawLeftAxis(updateChart) {
+            if  (updateChart) {
+                var t = d3.transition()
+                    .duration(750)
+                    .ease(d3.easeLinear);
+                canvasInnerWrapper.select('.axis.axis--y')
+                    .transition(t)
+                    .call(d3.axisLeft(scaleY));
+            } else {
+                canvasInnerWrapper.append("g")
+                    .attr("class", "axis axis--y")
+                    .call(d3.axisLeft(scaleY))
+                    .append('text')
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 6)
+                    .attr("dy", "0.71em")
+                    .attr("fill", "#000")
+                    .text("Defect counts");
+            }
+        }
+
+        function configureBottomAxisScale() {
+            scaleX.domain(xAxisTicks.values().sort());
+        }
+
+        function drawBottomAxis(updateChart) {
+            if  (updateChart) {
+                var t = d3.transition()
+                    .duration(750)
+                    .ease(d3.easeLinear);
+                canvasInnerWrapper.select('.axis.axis--x')
+                    .transition(t)
+                    .call(d3.axisBottom(scaleX));
+            } else {
+                canvasInnerWrapper.append('g')
+                    .attr("class", "axis axis--x")
+                    .attr("transform", "translate(0," + innerHeight + ")")
+                    .call(d3.axisBottom(scaleX));
+            }
+        }
+
+        function configureSeriesZAxis() {
+            scaleZ.domain(zAxisTicks.values().sort());
+        }
+
+        function drawSeries(seriesData) {
+            var t = d3.transition()
+                .duration(750)
+                .ease(d3.easeLinear);
+            var seriesGroup = canvasInnerWrapper.selectAll(".series")
+                .data(seriesData);
+            seriesGroup.attr("class", "series")
+                .attr("fill", function(d) { return scaleZ(d.key); });
+
+            seriesGroup.enter().append("g")
+                .attr("class", "series")
+                .attr("fill", function(d) { return scaleZ(d.key); });
+
+            seriesGroup.exit().remove();
+
+            var seriesRect = canvasInnerWrapper.selectAll(".series")
+                .selectAll("rect")
+                .data(function(d) { return d; });
+
+            seriesRect.exit().remove();
+
+            seriesRect.enter().append("rect")
+                .merge(seriesRect)
+                .attr("x", function(d) {
+                    return layoutType ? scaleX(d.data.versionID) + scaleX.bandwidth() / zAxisTicks.values().length* zAxisTicks.values().sort().indexOf(d3.select(this.parentNode).data()[0].key) : scaleX(d.data.versionID);
+                })
+                .attr("y", function(d) {
+                    return layoutType ? scaleY(d[1] - d[0]): scaleY(d[1]);
+                })
+                .attr("height", function(d) {
+                    return layoutType ? height - scaleY(d[1] - d[0]) : scaleY(d[0]) - scaleY(d[1]);
+                })
+                .attr("width", layoutType ? scaleX.bandwidth() / zAxisTicks.values().length : scaleX.bandwidth());
+        }
+
+        function drawLegend() {
+            var legend = canvasInnerWrapper.selectAll(".legend")
+                .data(zAxisTicks.values().sort());
+
+            legend.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+            legend.select('rect')
+                .attr("x", chartPlotAreaInnerWidth - 16)
+                .attr("width", 16)
+                .attr("height", 16)
+                .attr("fill", function(d) {
+                    return invisibleSeries.values().indexOf(d) === -1 ? scaleZ(d) : '#ffffff';
+                })
+                .attr("stroke", function(d) {
+                    return scaleZ(d);
+                })
+                .attr("stroke-width", 2);
+            legend.select("text")
+                .attr("x", chartPlotAreaInnerWidth - 24)
+                .attr("y", 9)
+                .attr("dy", ".35em")
+                .attr("text-anchor", "end")
+                .text(function(d) {
+                    return d;
+                });
+
+            var legendEnter = legend.enter().append("g")
+                .attr("class", "legend")
+                .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; })
+                .style("font", "10px sans-serif");
+
+            legendEnter.append("rect")
+                .attr("x", chartPlotAreaInnerWidth - 16)
+                .attr("width", 16)
+                .attr("height", 16)
+                .attr("fill", function(d) {
+                    return invisibleSeries.values().indexOf(d) === -1 ? scaleZ(d) : '#ffffff';
+                })
+                .attr("stroke", function(d) {
+                    return scaleZ(d);
+                })
+                .attr("stroke-width", 2);
+
+            legendEnter.append("text")
+                .attr("x", chartPlotAreaInnerWidth - 24)
+                .attr("y", 9)
+                .attr("dy", ".35em")
+                .attr("text-anchor", "end")
+                .text(function(d) {
+                    return d;
+                });
+            legend.exit().remove();
+
+            legend = canvasInnerWrapper.selectAll(".legend");
+            legend.on('click', function(d) {
+                invisibleSeries.has(d) ? invisibleSeries.remove(d) : invisibleSeries.add(d);
+                drawCompleteChart(calculateStackedData(), true);
+            });
+        }
+
+        function transitionStacked() {
+            layoutType = 0;
+            configureLeftAxisScale(scaleY);
+            drawLeftAxis(scaleY, canvas, true);
+            var t = d3.transition()
+                .duration(750)
+                .ease(d3.easeLinear)
+                .delay(function(d, i) { return i * 10; });
+            canvas.selectAll('g.series').selectAll("rect")
+                .transition(t)
+                .attr("x", function(d, i, j) {
+                    return scaleX(d.data.versionID);
+                })
+                .attr("y", function(d) {
+                    return scaleY(d[1]);
+                })
+                .attr("height", function(d) {
+                    return scaleY(d[0]) - scaleY(d[1]);
+                })
+                .attr("width", scaleX.bandwidth())
+                .transition(t);
+        }
+
+        function transitionGrouped() {
+            layoutType = 1;
+            configureLeftAxisScale(scaleY);
+            drawLeftAxis(scaleY, canvas, true);
+            var t = d3.transition()
+                .duration(750)
+                .ease(d3.easeLinear)
+                .delay(function(d, i) { return i * 10; });
+            canvas.selectAll('g.series').selectAll("rect")
+                .transition(t)
+                .attr("x", function(d) {
+                    return scaleX(d.data.versionID) + scaleX.bandwidth() / zAxisTicks.values().length* zAxisTicks.values().sort().indexOf(d3.select(this.parentNode).data()[0].key);
+                })
+                .attr("width", scaleX.bandwidth() / zAxisTicks.values().length)
+                .transition(t)
+                .attr("y", function(d) {
+                    return scaleY(d[1] - d[0]);
+                })
+                .attr("height", function(d) {
+                    return height - scaleY(d[1] - d[0]);
+                });
+        }
+
+        function switchGraphType(radioBtn) {
+            if (radioBtn.value === 'grouped') {
+                transitionGrouped();
+            } else {
+                transitionStacked();
+            }
+        }
+
+        function updateDimensions() {
+            chartContainerInnerWidth = chartContainer.offsetWidth - 30;
+            margin = chartContainerInnerWidth > breakPoint ? {top: 20, right: 80, bottom: 30, left: 50} : {top: 20, right: 0, bottom: 30, left: 0};
+            width = chartContainerInnerWidth > 960 ? 960 : (chartContainerInnerWidth > breakPoint ? breakPoint : chartContainerInnerWidth);
+            width = width - parseFloat(getComputedStyle(chartContainer).paddingLeft) - parseFloat(getComputedStyle(chartContainer).paddingRight);
+            height = 0.6 * width;
+            innerHeight = height - margin.top - margin.bottom;
+            chartPlotAreaInnerWidth = width - margin.left - margin.right;
+            svg.attr('height', height)
+                .attr('width', width);
+            canvasInnerWrapper.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+            scaleX.range([0, chartPlotAreaInnerWidth]);
+            scaleY.range([innerHeight, 0]);
+        }
+    }
 
     rc.models.treeMapChart = (obj) => {
         let breakPoint = 768,
@@ -2336,7 +2643,7 @@
             chartContainerInnerWidth, chartPlotAreaInnerWidth, svg, margin, width, height, innerHeight, simulation,
             root = hierarchyChart({key: 'World', values: d3.nest().key(function(d) { return d.region; }).key(function(d) { return d.subregion; }).entries(obj.unProcessedDataArray)});
         root.children.forEach(collapse);
-        d3.select(chartContainer).html('');
+
         svg = d3.select(chartContainer).append('svg');
         let canvasInnerWrapper = svg.append('g');
         updateDimensions();

@@ -91,13 +91,13 @@ router.get('/force', function(req, res, next) {
 });
 
 router.get('/stacked', function(req, res, next) {
-    let file = path.join(__dirname, '../data', 'salesHeirarchicalData.tsv');
+    let file = path.join(__dirname, '../data', 'JIRADummyData.json');
     fs.readFile(file, 'utf8', function (err, data) {
         if (err) {
             console.log('Error: ' + err);
             return;
         }
-        res.json(d3.tsvParse(data));
+        res.json(JSON.parse(data).data1);
     });
 });
 

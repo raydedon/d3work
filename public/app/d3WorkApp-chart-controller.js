@@ -7,7 +7,7 @@ angular.module('d3WorkApp')
         $scope.chartData = [];
         HttpService.chartDataByType($scope.chartType.toLowerCase())
             .then((response) => {
-                $scope.chartData = response;
+                $scope.chartData = response.data;
             }, (failedResponse) => {
                 console.log('failed to retrieve chart data');
             })
