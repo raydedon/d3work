@@ -2512,7 +2512,7 @@
                     return layoutType ? scaleY(d[1] - d[0]): scaleY(d[1]);
                 })
                 .attr("height", function(d) {
-                    return layoutType ? height - scaleY(d[1] - d[0]) : scaleY(d[0]) - scaleY(d[1]);
+                    return layoutType ? innerHeight - scaleY(d[1] - d[0]) : scaleY(d[0]) - scaleY(d[1]);
                 })
                 .attr("width", (d) => {
                     return layoutType ? scaleX.bandwidth() / zAxisTicks.values().length : scaleX.bandwidth()
@@ -2601,7 +2601,7 @@
                     return scaleY(d[1] - d[0]);
                 })
                 .attr("height", function(d) {
-                    return height - scaleY(d[1] - d[0]);
+                    return innerHeight - scaleY(d[1] - d[0]);
                 });
         }
 
