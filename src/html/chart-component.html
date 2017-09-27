@@ -1,0 +1,18 @@
+<div class="tooltip data-points-tooltip">
+    <div class="tooltip-inner"></div>
+</div>
+<div ng-if="$ctrl.chartType==='STACKED'">
+    <div id="settingForm" class="settings-form">
+        <div class="form-group pull-right">
+            <div class="form-control" style="border: none; box-shadow: none;">
+                <label class="radio-inline">
+                    <input type="radio" name="layoutType" ng-model="$ctrl.layoutType" value="1" ng-change="$ctrl.switchLayoutType()">Grouped
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="layoutType" ng-model="$ctrl.layoutType" value="0" ng-change="$ctrl.switchLayoutType()">Stacked
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="generic-chart-container" class="back-shadow"></div>

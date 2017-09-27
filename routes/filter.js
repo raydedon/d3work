@@ -14,7 +14,7 @@ router.get('/:id', function(req, res, next) {
         console.log("Looks like you are not sending the filter id to get the filter details.");
     }
     console.info("https://jira.optymyze.net/rest/api/latest/filter/" + req.params.id);
-    var options_auth = { user: "ray", password: "Passw0rd@12345" };
+    var options_auth = { user: "ray", password: "Passw0rd@123456" };
     var client = new Client(options_auth);
     client.get("https://jira.optymyze.net/rest/api/latest/filter/" + req.params.id, function (data, response) {
         // parsed response body as js object

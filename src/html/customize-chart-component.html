@@ -1,0 +1,205 @@
+<div class="tooltip data-points-tooltip">
+    <div class="tooltip-inner"></div>
+</div>
+<div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 ">
+    <div class="panel panel-primary">
+        <div class="panel-heading" id="panelHeadingSettings">
+            Demo customization capabilities of D3 charts
+        </div>
+        <div class="panel-body">
+            <select class="input-sm pull-right"
+                    ng-model="$ctrl.year"
+                    ng-change="$ctrl.changeYearReloadGraph();"
+                    ng-options="option as option for option in $ctrl.yearArr"
+                    ng-init="$ctrl.year=$ctrl.yearArr[0]">
+            </select>
+            <div id="panelId"></div>
+        </div>
+    </div>
+</div>
+<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 custom-menu">
+    <form>
+        <uib-accordion close-others="true">
+            <div uib-accordion-group class="panel-default" heading="Legend's config">
+                <div class="form-group">
+                    <label>Align</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <select class="form-control input-sm"
+                                ng-model="$ctrl.settingsObj.legend.align"
+                                ng-change="$ctrl.changeSettingsReloadGraph();"
+                                ng-options="option as option for option in ['left', 'center', 'right']"
+                                ng-init="$ctrl.settingsObj.legend.align='right'">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Vertical Align</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <select class="form-control input-sm"
+                                ng-model="$ctrl.settingsObj.legend.verticalAlign"
+                                ng-change="$ctrl.changeSettingsReloadGraph();"
+                                ng-options="option as option for option in ['top', 'middle', 'bottom']"
+                                ng-init="$ctrl.settingsObj.legend.verticalAlign='top'">
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div uib-accordion-group class="panel-default" heading="Chart Options">
+                <div class="form-group">
+                    <label>Stroke Width</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" min="1" max="10"
+                               ng-change="$ctrl.fiddleStrokeWidth();"
+                               ng-model="$ctrl.settingsObj.strokeWidth">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Tick Width</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" min="1" max="10"
+                               ng-change="$ctrl.fiddleTickWidth();"
+                               ng-model="$ctrl.settingsObj.tickWidth">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Tick Length</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" min="0" max="10"
+                               ng-change="$ctrl.fiddleTickLength();"
+                               ng-model="$ctrl.settingsObj.tickLength">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Display Grid Lines</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="checkbox"
+                               ng-change="$ctrl.toggleGridLines();"
+                               ng-model="$ctrl.settingsObj.displayGridLines">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Display Value on the Column&frasl;Bar</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="checkbox" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.displayValueOnColBar">
+                    </div>
+                </div>
+            </div>
+
+            <div uib-accordion-group class="panel-default" heading="Office Supplies config">
+                <div class="form-group">
+                    <label>Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                            <input ng-model="$ctrl.settingsObj.series[0].color" colorpicker type="text" ng-change="$ctrl.changeSettingsReloadGraph();">
+                    </div>
+                </div>
+            </div>
+
+            <div uib-accordion-group class="panel-default" heading="Furniture config">
+                <div class="form-group">
+                    <label>Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input ng-model="$ctrl.settingsObj.series[1].color" colorpicker type="text"  ng-change="$ctrl.changeSettingsReloadGraph();">
+                    </div>
+                </div>
+            </div>
+
+            <div uib-accordion-group class="panel-default" heading="Technology config">
+                <div class="form-group">
+                    <label>Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input ng-model="$ctrl.settingsObj.series[2].color" colorpicker type="text"  ng-change="$ctrl.changeSettingsReloadGraph();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Stroke width</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" min="1" max="10" value="2" ng-model="$ctrl.settingsObj.series[2].strokeWidth" ng-change="$ctrl.changeSettingsReloadGraph();">
+                    </div>
+                </div>
+            </div>
+
+            <div uib-accordion-group class="panel-default" heading="X axis config">
+                <div class="form-group">
+                    <label>Tick Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input ng-model="$ctrl.settingsObj.xAxis.tickColor" colorpicker type="text" ng-change="$ctrl.changeSettingsReloadGraph();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Tick Width</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" name="xAxisTickWidth" id="xAxisTickWidth" value="1" min="1" max="10"
+                               ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.xAxis.tickWidth">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Tick Length</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" value="6" min="0" max="10"
+                               ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.xAxis.tickLength">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Label Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input ng-model="$ctrl.settingsObj.xAxis.labelColor" colorpicker type="text" ng-change="$ctrl.changeSettingsReloadGraph();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Label Font Size</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" value="10" min="1" max="20" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.xAxis.tickLabelFontSize">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Display X Axis Grid Lines</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="checkbox" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.xAxis.displayGridLines">
+                    </div>
+                </div>
+            </div>
+
+            <div uib-accordion-group class="panel-default" heading="Y axis config">
+                <div class="form-group">
+                    <label>Tick Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                            <input ng-model="$ctrl.settingsObj.yAxis.tickColor" colorpicker type="text"  ng-change="$ctrl.changeSettingsReloadGraph();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Tick Width</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" value="1" min="1" max="10" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.yAxis.tickWidth">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Tick Length</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" value="6" min="0" max="10" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.yAxis.tickLength">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Label Color</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                            <input class="form-control input-sm" ng-model="$ctrl.settingsObj.yAxis.labelColor" colorpicker type="text"  ng-change="$ctrl.changeSettingsReloadGraph();">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Label Font Size</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="range" value="10" min="1" max="20" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.yAxis.tickLabelFontSize">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Display Y Axis Grid Lines</label>
+                    <div class="form-control" style="border: none; box-shadow: none;">
+                        <input type="checkbox" ng-change="$ctrl.changeSettingsReloadGraph();" ng-model="$ctrl.settingsObj.yAxis.displayGridLines">
+                    </div>
+                </div>
+            </div>
+
+        </uib-accordion>
+    </form>
+</div>
+

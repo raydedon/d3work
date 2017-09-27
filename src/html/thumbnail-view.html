@@ -1,0 +1,11 @@
+<div class="row"  ng-controller="chartListController">
+    <div class="col-xs-12 col-sm-12 col-md-4 chart-card" ng-repeat="chart in charts">
+        <a ui-sref="chart({ chartType: chart.type })" class="thumbnail">
+            <img alt="100%x200" src="{{chart.imageURL}}" class="img-thumbnail height-200">
+            <div class="caption">
+                <h3 ng-bind="chart.name"></h3>
+                <p ng-bind="chart.description"></p>
+            </div>
+        </a>
+    </div>
+</div>
