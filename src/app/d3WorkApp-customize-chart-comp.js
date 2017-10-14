@@ -10,7 +10,7 @@ angular.module('d3WorkApp')
             year: '<',
             updateSettingsReloadGraph: '&'
         },
-        templateUrl: '../html/customize-chart-component.html',
+        template: require('../html/customize-chart-component.html'),
         controller: ['HttpService', function(HttpService) {
             this.$onInit = () => {};
             this.$postLink = () => {};

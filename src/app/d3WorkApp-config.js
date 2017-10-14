@@ -7,14 +7,14 @@ angular.module('d3WorkApp')
         $stateProvider
             .state('home', {
                 url: '/home',
-                templateUrl: '../html/thumbnail-view.html'
+                template: require('../html/thumbnail-view.html')
             })
             .state('customize', {
                 url: '/customize',
-                templateUrl: '../html/customize-chart-landing.html'
+                template: require('../html/customize-chart-landing.html')
             })
             .state('chart', {
                 url: '/chart/:chartType',
-                templateUrl: '../html/chart.html'
+                template: require('../html/chart.html')
             })
     }]);

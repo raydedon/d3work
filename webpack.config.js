@@ -28,15 +28,7 @@ module.exports = {
             },
             {
                 test: /\.html$/,
-                use: [
-                    {
-                        loader: 'ngtemplate-loader',
-                        options: {
-                            relativeTo: 'src/'
-                        }
-                    },
-                    {loader: 'html-loader'}
-                ]
+                use: ['html-loader']
             }
         ]
     },

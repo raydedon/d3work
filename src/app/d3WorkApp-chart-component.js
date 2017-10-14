@@ -7,7 +7,7 @@ angular.module('d3WorkApp')
             chartType: '@',
             chartData: '<'
         },
-        templateUrl: '../html/chart-component.html',
+        template: require('../html/chart-component.html'),
         controller: ['HttpService', function(HttpService) {
             this.$onInit = () => {
                 this.layoutType = 0;
