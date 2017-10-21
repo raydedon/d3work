@@ -1,6 +1,8 @@
-$bootstrap-sass-asset-helper: true;
-@import "../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap-compass";
-@import "../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+$fa-font-path: "~font-awesome/fonts";
+@import '../../node_modules/font-awesome/scss/font-awesome';
+@import '../../node_modules/angular-bootstrap-colorpicker/css/colorpicker.css';
+@import '../../node_modules/angular-ui-bootstrap/dist/ui-bootstrap-csp.css';
+
 body {
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }

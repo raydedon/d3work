@@ -1,38 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="d3WorkApp" ng-strict-di>
 <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
-    <link rel='stylesheet' href='/stylesheets/font-awesome.css' />
-    <link rel="stylesheet" href="/stylesheets/ui-bootstrap-csp.css">
-    <link rel="stylesheet" href="/stylesheets/colorpicker.min.css">
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="/javascripts/angular.js"></script>
-    <script src="/javascripts/angular-ui-router.min.js"></script>
-<!--
-    <script src="/javascripts/angular-animate.js"></script>
-    <script src="/javascripts/angular-sanitize.js"></script>
-    <script src="/javascripts/ng-i18next.min.js"></script>
--->
-    <script src="/javascripts/d3.js"></script>
-    <script src="/javascripts/d3-queue.min.js"></script>
-    <script src="/javascripts/responsive-chart.js"></script>
-    <script src="/javascripts/bootstrap-colorpicker-module.min.js"></script>
-    <script src="/javascripts/ui-bootstrap-tpls.js"></script>
-
-<!--
-    <script src="/app/d3WorkApp-main-module.js"></script>
-    <script src="/app/d3WorkApp-config.js"></script>
-    <script src="/app/d3WorkApp-services.js"></script>
-    <script src="/app/d3WorkApp-chart-list-controller.js"></script>
-    <script src="/app/d3WorkApp-chart-controller.js"></script>
-    <script src="/app/d3WorkApp-chart-component.js"></script>
-    <script src="/app/d3WorkApp-customize-chart-comp.js"></script>
-    <script src="/app/d3WorkApp-customize-chart-controller.js"></script>
--->
-    <script src="/main.bundle.js"></script>
+    <title><%= htmlWebpackPlugin.options.title %></title>
 </head>
 <body>
 <nav class="navbar navbar-default">

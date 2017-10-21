@@ -2,42 +2,42 @@
     {
         "name": "Combined Chart",
         "type": "COMBINED",
-        "imageURL": "/images/combined.png",
+        "imageURL": "combined",
         "description": "It is a mixture of all the chart types. The Series would be repersented in form of Line and Column."
     }, {
         "name": "Radial Dendogram",
         "type": "CLUSTER",
-        "imageURL": "/images/radialcluster.png",
+        "imageURL": "radialcluster",
         "description": "This is a type of Cluster graph. But colloquially it is called a Radial Dendogram."
     }, {
         "name": "Line Chart",
         "type": "LINE",
-        "imageURL": "/images/line.png",
+        "imageURL": "line",
         "description": "It is line chart. But all the datapoints are not shown in one shot. It adds data points in iteration."
     }, {
         "name": "Hierarchy Chart",
         "type": "HIERARCHY",
-        "imageURL": "/images/hierarchy.png",
+        "imageURL": "hierarchy",
         "description": "It is a Sales hierarchy chart with drag and drop feature."
     }, {
         "name": "Chord Chart",
         "type": "CHORD",
-        "imageURL": "/images/chord.png",
+        "imageURL": "chord",
         "description": "This chart helps in analyzing the frequency of rides between various neighborhoods in San Francisco."
     }, {
         "name": "Force Chart",
         "type": "FORCE",
-        "imageURL": "/images/force.png",
+        "imageURL": "force",
         "description": "It is a Hierarchy chart with Forced layout."
     }, {
         "name": "Stacked Chart",
         "type": "STACKED",
-        "imageURL": "/images/stacked.png",
+        "imageURL": "stacked",
         "description": "It is a Stacked vs Grouped chart."
     }, {
         "name": "Tree Map Chart",
         "type": "TREEMAP",
-        "imageURL": "/images/tree_map.png",
+        "imageURL": "tree_map",
         "description": "It is a zoomable Tree map, which depicts World Population."
     }
 ]

@@ -7,4 +7,8 @@ angular.module('d3WorkApp')
             .then(function (result) {
                 $scope.charts = result.data;
             });
+
+        $scope.imageUrl = (image) => {
+            return require('../images/' + image + '.png');
+        }
     }]);

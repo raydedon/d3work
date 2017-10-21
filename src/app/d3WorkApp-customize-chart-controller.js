@@ -23,7 +23,7 @@ angular.module('d3WorkApp')
         let thisCtrl = this;
         HttpService.chartDataByType($scope.chartType.toLowerCase())
             .then((response) => {
-                $scope.processedDataArray = thisCtrl.groupNAggregateNSortJSONData(response);
+                $scope.processedDataArray = thisCtrl.groupNAggregateNSortJSONData(response.data || {});
                 angular.forEach($scope.processedDataArray, function (value, index) {
                     $scope.yearArr.push(value.key);
                 });
