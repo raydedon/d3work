@@ -30,13 +30,12 @@ const prodCSS = ExtractTextPlugin.extract({
     use: ['css-loader', 'postcss-loader']
 });
 const cssConfig = isProd ? prodCSS : devCSS;
-console.log(`NODE_ENV ${isProd} ${process.env.NODE_ENV} ${scssConfig}`);
+console.log(`NODE_ENV ${isProd} ${process.env.NODE_ENV} ${scssConfig} build started at: ${new Date().toLocaleTimeString()}`);
 module.exports = {
     context: path.resolve(__dirname, 'public'),
     devtool: 'cheap-module-eval-source-map',
     entry: {
-        main: '../src/app/d3WorkApp-main-module.js',
-        bootstrap: bootstrapConfig
+        main: '../src/app/d3WorkApp-main-module.js'
     },
     output: {
         path: path.resolve(__dirname, 'public'),
@@ -51,11 +50,11 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: prodCSS
+                use: cssConfig
             },
             {
                 test: /\.scss$/,
-                use: prodSCSS
+                use: scssConfig
             },
             {
                 test: /\.(png|jpg|gif|ttf|eot|woff2?|svg)$/,
@@ -82,8 +81,8 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(pathsToClean, cleanOptions),
         new ExtractTextPlugin({
-            filename: 'styles.css',
-            disable: false,
+            filename: '[name].css',
+            disable: !isProd,
             allChunks: true
         }),
         new HtmlWebpackPlugin({
