@@ -1037,6 +1037,10 @@
                 .header("Content-Type", "application/json")
                 .post(JSON.stringify({'searchUrl': jsonObj.searchUrl, 'startAt': parseInt(jsonObj.startAt), 'maxResults': parseInt(jsonObj.maxResults)}),
                     function(err, data){
+                        if(!(angular.element(document.querySelector('[ng-controller="chartController"]')).length &&
+                            angular.element(document.querySelector('[ng-controller="chartController"]')).scope().chartType.toLowerCase() === obj.chartType.toLowerCase())) {
+                            return;
+                        }
                         unProcessedDataArray = unProcessedDataArray.concat(data.result);
                         console.log("got response for issues the length of data is : " + unProcessedDataArray.length);
                         processTheRawDataAndDrawGraph(updateChart);

@@ -86,7 +86,7 @@ module.exports = {
             allChunks: true
         }),
         new HtmlWebpackPlugin({
-            title: 'Custom template',
+            title: 'D3 Visualization',
             template: '../views/index.ejs',
             hash: true,
             cache: true

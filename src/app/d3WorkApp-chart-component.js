@@ -18,6 +18,9 @@ angular.module('d3WorkApp')
                 window.dispatchEvent(new CustomEvent('customEvent'));
             };
 
+            this.$onDestroy = function () {
+                rc.render.queue = [];
+            };
 
             this.$onChanges = (changes) => {
                 if (changes.chartData && !changes.chartData.isFirstChange()) {
