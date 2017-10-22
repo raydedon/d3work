@@ -218,6 +218,7 @@
             chartContainer = rc.utils.getChartContainer(obj),
             chartContainerInnerWidth, chartPlotAreaInnerWidth, svg, margin, width, height, innerHeight;
 
+        d3.select(chartContainer).html('');
         svg = d3.select(chartContainer).append('svg');
         var canvasInnerWrapper = svg.append('g'),
             scaleX = d3.scaleBand().paddingInner(0.1).paddingOuter(0.03),
@@ -456,7 +457,7 @@
                     return d;
                 }
             });
-            return seriesData[seriesData.length - 1].values;
+            return seriesData.length ? seriesData[seriesData.length - 1].values : [];
         }
 
         function configureLeftAxisScale(ticksArray) {

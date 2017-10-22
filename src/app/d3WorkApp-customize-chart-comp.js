@@ -5,7 +5,6 @@ angular.module('d3WorkApp')
     .component('customizeChartComponent', {
         bindings: {
             settingsObj: '<',
-            count: '@',
             yearArr: '<',
             year: '<',
             updateSettingsReloadGraph: '&'
@@ -16,8 +15,7 @@ angular.module('d3WorkApp')
             this.$postLink = () => {};
 
             this.$onChanges = (changes) => {
-                if (changes.count && !changes.count.isFirstChange()) {
-                    this.settingsObj = angular.copy(this.settingsObj);
+                if (changes.settingsObj && !changes.settingsObj.isFirstChange()) {
                     rc.addGraph(this.settingsObj);
                 }
             };

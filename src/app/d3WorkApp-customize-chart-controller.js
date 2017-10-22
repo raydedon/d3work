@@ -14,12 +14,12 @@ angular.module('d3WorkApp')
             xAxis: {},
             yAxis: {},
             strokeWidth: 1,
-            tickLength: 6
+            tickLength: 6,
+            unProcessedDataArray: []
         };
         $scope.processedDataArray = [];
         $scope.yearArr = [];
         $scope.year = '';
-        $scope.count = 0;
         let thisCtrl = this;
         HttpService.chartDataByType($scope.chartType.toLowerCase())
             .then((response) => {
@@ -29,7 +29,7 @@ angular.module('d3WorkApp')
                 });
                 $scope.year = $scope.yearArr[0];
                 $scope.settingsObj.unProcessedDataArray = $scope.processedDataArray.filter(function(d) {return d.key ===  $scope.year})[0].values;
-                $scope.count++;
+                $scope.settingsObj = angular.copy($scope.settingsObj);
             }, (failedResponse) => {
                 console.log('failed to retrieve chart data');
             });
@@ -43,7 +43,7 @@ angular.module('d3WorkApp')
         };
         $scope.updateSettingsReloadGraph = (event) => {
             if(event.settingsObj) {
-                $scope.settingsObj = event.settingsObj;
+                $scope.settingsObj = angular.copy(event.settingsObj);
             }
             if(event.year) {
                 $scope.year = event.year;
@@ -51,6 +51,5 @@ angular.module('d3WorkApp')
                 obj.unProcessedDataArray = $scope.processedDataArray.filter(function(d) {return d.key ===  $scope.year})[0].values;
                 $scope.settingsObj = obj;
             }
-            $scope.count++;
         };
     }]);
