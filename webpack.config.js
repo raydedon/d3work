@@ -97,5 +97,5 @@ module.exports = {
             d3: 'd3'
         })
     ],
-    watch: true
+    watch: !isProd
 };
