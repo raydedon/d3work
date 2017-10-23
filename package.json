@@ -8,7 +8,7 @@
     "webpack-watch": "webpack --watch",
     "webpack-dev-build": "SET NODE_ENV=dev&& webpack",
     "clean": "rimraf ./public/*.*",
-    "webpack-prod-build": "SET NODE_ENV=prod&& webpack -p"
+    "webpack-prod-build": "NODE_ENV=prod webpack -p"
   },
   "repository": {
     "type": "git",

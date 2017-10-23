@@ -96,6 +96,5 @@ module.exports = {
             $: 'jquery',
             d3: 'd3'
         })
-    ],
-    watch: !isProd
+    ]
 };
