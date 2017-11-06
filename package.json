@@ -66,3 +66,5 @@
     "webpack": "^3.8.0"
   }
 }
+
+//angular angular-bootstrap-colorpicker angular-ui-bootstrap angular-ui-router babel babel-core babel-loader babel-preset-es2015 babel-preset-stage-0 body-parser bootstrap-loader bootstrap-sass clean-webpack-plugin cookie-parser css-loader d3 ejs exports-loader express extract-text-webpack-plugin file-loader font-awesome history html-loader html-webpack-plugin imports-loader jquery morgan node-rest-client node-sass postcss postcss-loader ramda ramda-loader raw-loader resolve-url-loader rimraf sass-loader serve-favicon style-loader tsv url-loader webpack
