@@ -16,7 +16,7 @@ router.post('/', function(req, res, next) {
         res.send({"Error": "Looks like you are not sending the search url."});
         console.log("Looks like you are not sending the search url.");
     }
-    var options_auth = { user: "ray", password: "Passw0rd@123456" };
+    var options_auth = { user: "ray", password: "Passw0rd@7" };
     var client = new Client(options_auth);
     var params = {'startAt': req.body.startAt, 'maxResults': req.body.maxResults};
     var searchURL = req.body.searchUrl + '&' + querystring.stringify(params);

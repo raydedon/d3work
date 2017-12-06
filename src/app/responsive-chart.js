@@ -1041,10 +1041,10 @@
                             angular.element(document.querySelector('[ng-controller="chartController"]')).scope().chartType.toLowerCase() === obj.chartType.toLowerCase())) {
                             return;
                         }
-                        unProcessedDataArray = unProcessedDataArray.concat(data.result);
+                        unProcessedDataArray = unProcessedDataArray.concat(data ? (data.result || []) : []);
                         console.log("got response for issues the length of data is : " + unProcessedDataArray.length);
                         processTheRawDataAndDrawGraph(updateChart);
-                        if (parseInt(data.total) - (parseInt(data.startAt) + parseInt(data.maxResults)) > 0) {
+                        if (data && (parseInt(data.total) - (parseInt(data.startAt) + parseInt(data.maxResults)) > 0)) {
                             fetchIssuesAndDrawGraph({'searchUrl': jsonObj.searchUrl, 'startAt': parseInt(data.startAt) + parseInt(data.maxResults), 'maxResults': data.maxResults}, true);
                         }
                     }
