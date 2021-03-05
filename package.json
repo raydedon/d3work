@@ -6,9 +6,9 @@
   "scripts": {
     "start": "node ./bin/www",
     "webpack-watch": "webpack --watch",
-    "webpack-dev-build": "SET NODE_ENV=dev&& webpack",
+    "webpack-dev-build": "set NODE_ENV=dev && webpack",
     "clean": "rimraf ./public/*.*",
-    "webpack-prod-build": "NODE_ENV=prod webpack -p"
+    "webpack-prod-build": "set NODE_ENV=prod && webpack -p"
   },
   "repository": {
     "type": "git",
