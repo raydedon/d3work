@@ -6,7 +6,6 @@ let router = express.Router();
 let fs = require('fs');
 let path = require("path");
 let d3 = require('d3');
-let forceCHartData = require('../data/forceLayoutJSON.json');
 /* GET users listing. */
 router.get('/', function(req, res, next) {
     let file = path.join(__dirname, '../data', 'charts.json');
@@ -80,7 +79,6 @@ router.get('/chord', function(req, res, next) {
 });
 
 router.get('/force', function(req, res, next) {
-/*
     let file = path.join(__dirname, '../data', 'forceLayoutJSON.json');
     fs.readFile(file, 'utf8', function (err, data) {
         if (err) {
@@ -89,8 +87,6 @@ router.get('/force', function(req, res, next) {
         }
         res.json(JSON.parse(data));
     });
-*/
-    res.json(forceCHartData);
 });
 
 router.get('/stacked', function(req, res, next) {

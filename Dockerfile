@@ -1,12 +1,13 @@
-FROM node:10
+FROM node:latest
+RUN mkdir -p /usr/src/d3work
 
 WORKDIR /usr/src/d3work
 
 COPY package*.json ./
 
-RUN npm ci --only=production
+RUN npm ci
 
-COPY . .
+COPY . ./
 
 EXPOSE 3000
 
