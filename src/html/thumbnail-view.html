@@ -1,5 +1,5 @@
-<div class="row"  ng-controller="chartListController">
-    <div class="col-xs-12 col-sm-12 col-md-4 chart-card" ng-repeat="chart in charts">
+<div class="thumbnail-list-container"  ng-controller="chartListController">
+    <div class="chart-card" ng-repeat="chart in charts">
         <a ui-sref="chart({ chartType: chart.type })" class="thumbnail">
             <img alt="100%x200" ng-src="{{imageUrl(chart.imageURL)}}" class="img-thumbnail height-200">
             <div class="caption">

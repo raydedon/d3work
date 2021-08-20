@@ -15,6 +15,37 @@ svg {
     display: block;
     margin: 0 auto;
 }
+.thumbnail-list-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 20px
+}
+
+
+@media screen and (max-width: 1200px) {
+    .thumbnail-list-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    .thumbnail-list-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .thumbnail-list-container {
+        padding-top: 80px;
+    }
+}
+
+/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+    .thumbnail-list-container {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
 
 .series {
     .data-point {
