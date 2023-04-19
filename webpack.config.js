@@ -13,9 +13,6 @@ const cleanOptions = {
 
 const isProd = (process.env.NODE_ENV || 'dev') === 'prod';
 
-const bootstrapEntryPoints = require('./webpack.bootstrap.config');
-const bootstrapConfig = isProd ? bootstrapEntryPoints.prod : bootstrapEntryPoints.dev;
-
 const devSCSS = ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'];
 const prodSCSS = ExtractTextPlugin.extract({
     fallback: 'style-loader',
@@ -76,7 +73,7 @@ module.exports = {
         ]
     },
     performance: {
-        hints: "error"
+        hints: "warning"
     },
     plugins: [
         new CleanWebpackPlugin(pathsToClean, cleanOptions),

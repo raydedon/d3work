@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:14
 RUN mkdir -p /usr/src/d3work
 
 WORKDIR /usr/src/d3work
@@ -9,6 +9,8 @@ RUN npm ci
 
 COPY . ./
 
+RUN npm run webpack-prod-build
+
 EXPOSE 3000
 
-CMD ["/bin/sh", "script.sh"]
+CMD ["node", "./bin/www"]
